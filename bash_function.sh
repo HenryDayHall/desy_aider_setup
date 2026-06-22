@@ -75,7 +75,7 @@ DESY_MODELS=(
     "dcache-docs"
 )
 
-# Autocomplete function for both aider_desy and aider_bla_s
+# Autocomplete function for both aider_desy and aider_blablador
 _aider_models_complete() {
     local cur cmd models
     COMPREPLY=()
@@ -84,7 +84,7 @@ _aider_models_complete() {
 
     if [[ "$cmd" == "aider_desy" ]]; then
         models=("${DESY_MODELS[@]}")
-    elif [[ "$cmd" == "aider_bla_s" ]]; then
+    elif [[ "$cmd" == "aider_blablador" ]]; then
         models=("${BLABLADOR_MODELS[@]}")
     else
         models=()
