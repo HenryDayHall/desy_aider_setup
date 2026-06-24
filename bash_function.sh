@@ -45,6 +45,22 @@ get_api_key_flags() {
     echo "${flags# }"  # trim leading space
 }
 
+get_service_url() {
+   if [[ -z "$1" ]]; then
+       echo "Must give a service name"
+       return 1
+   fi
+   local url=""
+   case "$1" in
+       blablador)   url="https://api.helmholtz-blablador.fz-juelich.de/v1/" ;;
+       desy)        url="https://assistant.desy.de/api/" ;;
+   esac
+   if [[ -z "$url" ]]; then
+       echo "Don't have a url for service named <$1>"
+       return 1
+   fi
+   echo $url
+}
 
 # list of available BLABLADOR models from (blablador_description.json)
 BLABLADOR_MODELS=(
@@ -101,14 +117,17 @@ _aider_models_complete() {
 complete -F _aider_models_complete aider_desy aider_blablador
 
 aider_blablador() {
+    local service="blablador"
+
     # First argument can specify the model to use; defaults to "fast"
     local model="${1:-fast}"
     shift
 
+
     local flags
-    flags=$( get_api_key_flags blablador )
+    flags=$( get_api_key_flags $service )
     aider $flags \
-        --openai-api-base="https://api.helmholtz-blablador.fz-juelich.de/v1/" \
+        --openai-api-base=$( get_service_url $service ) \
         --model="openai/alias-${model}"\
         --no-auto-commits \
         --watch-files \
@@ -122,14 +141,15 @@ aider_blablador() {
 
 
 aider_desy() {
+    local service="desy"
     # First argument can specify the model to use; defaults to "coding"
     local model="${1:-coding}"
     shift
 
     local flags
-    flags=$( get_api_key_flags desy )
+    flags=$( get_api_key_flags $service )
     aider $flags \
-        --openai-api-base="https://assistant.desy.de/api/"\
+        --openai-api-base=$( get_service_url $service )\
         --model="openai/${model}"\
         --no-auto-commits \
         --watch-files \
