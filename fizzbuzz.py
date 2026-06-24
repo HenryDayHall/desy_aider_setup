@@ -19,5 +19,6 @@ def fizzbuzz(start: int = 1, end: int = 100) -> None:
         print(output or i)
         i += 1
 
+
 if __name__ == '__main__':
     fizzbuzz()
