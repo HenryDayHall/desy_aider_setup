@@ -12,9 +12,9 @@ get_password() {
 # make a dict with your desired services
 # local -A api_key_dict=( ["service1"]="" ["service2"]="" ...)
 # pass it to the fuction
-# get_api_keys api_key_dict
+# _get_api_keys api_key_dict
 # function will put the api in each dict entry if found in the password manager
-get_api_keys() {
+_get_api_keys() {
     declare -n _callers_dict="$1"
     local db=~/Accounts/passwordManager/API_keys.kdbx
     local password
@@ -33,9 +33,9 @@ get_api_keys() {
     done
 }
 
-# Takes a dict of API keys (built by get_api_keys) and returns the flags string.
-# Usage: get_api_key_flags api_key_dict
-get_api_key_flags() {
+# Takes a dict of API keys (built by _get_api_keys) and returns the flags string.
+# Usage: _get_api_key_flags api_key_dict
+_get_api_key_flags() {
     declare -n _keys_dict="$1"
 
     # Enforce mutual exclusivity between desy and blablador
@@ -71,6 +71,13 @@ get_api_key_flags() {
 get_current_description() {
     local service="$1"
     local key="$2"
+    # if key is empty, use _get_api_keys to get the key
+    if [[ -z "$key" ]]; then
+        local -A api_key_dict=( ["$service"]="" )
+        _get_api_keys api_key_dict || return 1
+        key="${api_key_dict[$service]}"
+    fi
+
     local url=$( get_service_url "$service" )
     # Append /models to get the list of available models
     local models_url="${url}models"
@@ -94,28 +101,51 @@ get_last_description() {
 }
 
 
-# Takes a dict of API keys (built by get_api_keys) and checks the last descriptions match the current ones
+# Takes a dict of API keys (built by _get_api_keys) and checks the last descriptions match the current ones
 # updates if needed, and echos all the services that are updated
-check_update_descriptions() {
+_check_update_descriptions() {
     declare -n _keys_dict="$1"
     for service in "${!_keys_dict[@]}"; do
         local key="${_keys_dict[$service]}"
         local current_description
         current_description=$( get_current_description "$service" "$key" )
+        # prettyify
+        current_description=$( echo $current_description | python3 -m json.tool )
         local last_description
         last_description=$( get_last_description "$service" 2>/dev/null ) || true
         # check if they match
-        if [[ "$current_description" != "$last_description" ]]; then
+        # some timestamps get updated with every call, so this is a safe comparison function
+        local stripped_current=$(echo $current_description | grep -v '[0-9]\{10\}')
+        local stripped_last=$(echo $last_description | grep -v '[0-9]\{10\}')
+        if [[ "$stripped_current" != "$stripped_last" ]]; then
             # if they don't match, write a new last description and echo the service name
             local timestamp
             timestamp=$( date +%Y-%m-%d-%H )
             local filename="${service_descriptions_folder}/${service}_${timestamp}.json"
-            echo "$current_description" > "$filename"
-            echo "$service"
+            echo "$current_description" > $filename
+            echo "Description has changed for ${service}"
         fi
     done
 }
 
+
+
+check_update_descriptions() {
+    # if there are arguments, make them into a dict with blank keys
+    local -A key_dict=()
+    for service in "$@"; do
+        key_dict["$service"]=""
+    done
+
+    if [[ ${#key_dict[@]} -eq 0 ]]; then
+        key_dict["desy"]=""
+        key_dict["blablador"]=""
+    fi
+
+    _get_api_keys key_dict
+
+    _check_update_descriptions key_dict
+}
 
 get_service_url() {
    if [[ -z "$1" ]]; then
@@ -163,6 +193,15 @@ DESY_MODELS=(
     "dcache-docs"
 )
 
+# function that extracts a list of model names from a json string
+extract_model_names() {
+    local last_description=$( get_last_description "$1" )
+    # for each line with "id: " extract the word following " id:" 
+}
+
+
+
+
 # Autocomplete function for both aider_desy and aider_blablador
 _aider_models_complete() {
     local cur cmd models
@@ -197,10 +236,10 @@ aider_blablador() {
 
     # Build the API keys dict and retrieve keys
     local -A api_key_dict=( ["$service"]="" )
-    get_api_keys api_key_dict || return 1
+    _get_api_keys api_key_dict || return 1
 
     local flags
-    flags=$( get_api_key_flags api_key_dict ) || return 1
+    flags=$( _get_api_key_flags api_key_dict ) || return 1
     aider $flags \
         --openai-api-base=$( get_service_url $service ) \
         --model="openai/alias-${model}"\
@@ -222,10 +261,10 @@ aider_desy() {
 
     # Build the API keys dict and retrieve keys
     local -A api_key_dict=( ["$service"]="" )
-    get_api_keys api_key_dict || return 1
+    _get_api_keys api_key_dict || return 1
 
     local flags
-    flags=$( get_api_key_flags api_key_dict ) || return 1
+    flags=$( _get_api_key_flags api_key_dict ) || return 1
     aider $flags \
         --openai-api-base=$( get_service_url $service )\
         --model="openai/${model}"\
