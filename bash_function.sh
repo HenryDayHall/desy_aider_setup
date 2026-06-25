@@ -129,7 +129,6 @@ _check_update_descriptions() {
 }
 
 
-
 check_update_descriptions() {
     # if there are arguments, make them into a dict with blank keys
     local -A key_dict=()
@@ -146,6 +145,7 @@ check_update_descriptions() {
 
     _check_update_descriptions key_dict
 }
+
 
 get_service_url() {
    if [[ -z "$1" ]]; then
@@ -164,42 +164,19 @@ get_service_url() {
    echo $url
 }
 
-# list of available BLABLADOR models from (blablador_description.json)
-BLABLADOR_MODELS=(
-    "apertus"
-    "eve"
-    "fast"
-    "huge"
-    "large"
-    "code"
-    "embeddings"
-    "qwen3-8b-embeddings"
-    "qwen36-35b"
-    "kimi-k2.7-code"
-    "minimax-m3"
-    "mis"
-    "qwen-huge"
-)
-
-# List of available DESY models (from desy_description.json)
-DESY_MODELS=(
-    "desy-assistant"
-    "reasoning"
-    "coding"
-    "it-uco"
-    "maxwell"
-    "maxwell-cssb-cryoem"
-    "naf"
-    "dcache-docs"
-)
 
 # function that extracts a list of model names from a json string
 extract_model_names() {
     local last_description=$( get_last_description "$1" )
-    # for each line with "id: " extract the word following " id:" 
+    # Use python3 to parse the JSON and extract all "id" values from the data array
+    local model_names=$(python3 -c "
+import json, sys
+data = json.loads(sys.stdin.read())
+for item in data.get('data', []):
+    print(item.get('id', ''))
+    " <<< "$last_description")
+    echo $model_names
 }
-
-
 
 
 # Autocomplete function for both aider_desy and aider_blablador
@@ -210,9 +187,18 @@ _aider_models_complete() {
     cmd="${COMP_WORDS[0]}"
 
     if [[ "$cmd" == "aider_desy" ]]; then
-        models=("${DESY_MODELS[@]}")
+        local desy_models=$(extract_model_names "desy")
+        models=("${desy_models[@]}")
     elif [[ "$cmd" == "aider_blablador" ]]; then
-        models=("${BLABLADOR_MODELS[@]}")
+        local blablador_models=$(extract_model_names "blablador")
+        # only keep the ones that start with "alias-" and trim the "alias-"
+        local filtered=()
+        for model in $blablador_models; do
+            if [[ "$model" == alias-* ]]; then
+                filtered+=("${model#alias-}")
+            fi
+        done
+        models=("${filtered[@]}")
     else
         models=()
     fi
@@ -237,6 +223,7 @@ aider_blablador() {
     # Build the API keys dict and retrieve keys
     local -A api_key_dict=( ["$service"]="" )
     _get_api_keys api_key_dict || return 1
+    _check_update_descriptions api_key_dict
 
     local flags
     flags=$( _get_api_key_flags api_key_dict ) || return 1
@@ -262,6 +249,7 @@ aider_desy() {
     # Build the API keys dict and retrieve keys
     local -A api_key_dict=( ["$service"]="" )
     _get_api_keys api_key_dict || return 1
+    _check_update_descriptions api_key_dict
 
     local flags
     flags=$( _get_api_key_flags api_key_dict ) || return 1

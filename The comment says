@@ -1,6 +1,0 @@
-# usage;
-# make a dict with your desired services
-# local -A api_key_dict=( ["service1"]="" ["service2"]="" ...)
-# pass it to the fuction
-# get_api_keys api_key_dict
-# function will put the api in each dict entry if found in the password manager
