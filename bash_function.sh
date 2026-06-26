@@ -306,6 +306,12 @@ _aider_models_complete() {
         models=()
     fi
 
+    # Add all models for claude (always available)
+    local claude_models=$(extract_model_names "claude" 2>/dev/null) || true
+    if [[ -n "$claude_models" ]]; then
+        models+=($claude_models)
+    fi
+
     # Autocomplete up to 3 positional arguments (model names)
     if [[ $COMP_CWORD -ge 1 && $COMP_CWORD -le 3 ]]; then
         COMPREPLY=( $(compgen -W "${models[*]}" -- "$cur") )
@@ -316,11 +322,9 @@ _aider_models_complete() {
 # Register autocomplete for both commands
 complete -F _aider_models_complete aider_desy aider_blablador
 
-#--cache-prompts \  # only works on some apis
-#--no-stream \  # needed to see cache statistics and costs
 
 # consider leaving these to .aider.conf.yml
-default_aider_flags() {
+_aider_default_flags() {
     echo "  --no-auto-commits \
             --watch-files \
             --dark-mode \
@@ -351,6 +355,214 @@ check_for_aider_confs() {
     fi
 }
 
+_aider_chat_flags() {
+    local chat_scale="${1:-5}"
+    if ! [[ "$chat_scale" =~ ^([0-9]|10)$ ]]; then
+        echo "Error: chat_scale must be an integer 0-10" >&2
+        return 1
+    fi
+
+    # continuous values: linear ramps
+    local history_tokens=$(( chat_scale * 4000 ))   # 0 .. 40k
+    local thinking_tokens=$(( chat_scale * 3200 ))  # 0 .. 32k
+
+    # reasoning-effort is ENUMERATED, not continuous -> bucket it
+    local effort
+    if   (( chat_scale <= 3 )); then effort="low"
+    elif (( chat_scale <= 7 )); then effort="medium"
+    else                             effort="high"
+    fi
+
+    echo "--max-chat-history-tokens ${history_tokens} --thinking-tokens ${thinking_tokens} --reasoning-effort ${effort}"
+}
+
+_aider_map_flags() {
+    local map_scale="${1:-5}"
+    if ! [[ "$map_scale" =~ ^([0-9]|10)$ ]]; then
+        echo "Error: map_scale must be an integer 0-10" >&2
+        return 1
+    fi
+
+    # scale 0 disables the repo map entirely
+    if (( map_scale == 0 )); then
+        echo "--map-tokens 0"
+        return 0
+    fi
+
+    local map_tokens=$(( map_scale * 1024 ))        # 1k .. 10k (default is 1024)
+    # multiplier (default 2) ramps 1->4 across the range
+    local multiplier=$(( 1 + (map_scale - 1) * 3 / 9 ))
+
+    echo "--map-tokens ${map_tokens} --map-multiplier-no-files ${multiplier}"
+}
+
+_aider_cache_flags() {
+    local cache_variant="${1:-cache}"   # note: "variant" not "varient"
+    case "$cache_variant" in
+        cache)    echo "--cache-prompts --cache-keepalive-pings 2" ;;  # ~30 min warm
+        no-cache) echo "--no-cache-prompts" ;;
+        *) echo "Error: cache variant must be 'cache' or 'no-cache'" >&2; return 1 ;;
+    esac
+}
+
+
+
+# ---------------------------------------------------------------------------
+# _get_model_flags_by_service
+# Description: Takes a default service name (desy or blablador) and up to 3
+#              model names. Models can be from the default service or from
+#              claude. Formats them into --model, --weak-model, --editor-model
+#              flags with appropriate defaults from the default service.
+# Usage:       _get_model_flags_by_service <service> [model1] [model2] [model3]
+# Arguments:   $1 - Service name ('desy' or 'blablador').
+#              $2..$4 - Up to 3 model names (optional). Arguments starting
+#                       with '-' are treated as flags and stop positional parsing.
+# Returns:     Prints the flags string to stdout.
+# ---------------------------------------------------------------------------
+_get_model_flags_by_service() {
+    local service="$1"
+    shift
+
+    # Collect up to 3 positional model arguments (non-flag)
+    local models=()
+    while [[ $# -gt 0 && ! "$1" =~ ^- ]]; do
+        models+=("$1")
+        shift
+        if [[ ${#models[@]} -eq 3 ]]; then
+            break
+        fi
+    done
+
+    # Set defaults based on service
+    local default_model default_weak default_editor
+    case "$service" in
+        desy)
+            default_model="reasoning"
+            default_weak="desy-assistant"
+            default_editor="coding"
+            ;;
+        blablador)
+            default_model="huge"
+            default_weak="fast"
+            default_editor="code"
+            ;;
+        *)
+            echo "Error: unknown service '$service'" >&2
+            return 1
+            ;;
+    esac
+
+    # Retrieve claude model names for cross-service detection
+    local -a claude_models=()
+    while IFS= read -r line; do
+        claude_models+=("$line")
+    done < <(extract_model_names "claude" 2>/dev/null || true)
+
+    # Helper: check if a model name belongs to claude
+    _is_claude_model() {
+        local name="$1"
+        # Exact match against known claude model IDs
+        for cm in "${claude_models[@]}"; do
+            if [[ "$cm" == "$name" ]]; then
+                return 0
+            fi
+        done
+        # Fallback heuristic: name contains "claude" (case-insensitive)
+        if [[ "${name,,}" == *claude* ]]; then
+            return 0
+        fi
+        return 1
+    }
+
+    # Build the three model flags
+    local model="${models[0]:-$default_model}"
+    local weak="${models[1]:-$default_weak}"
+    local editor="${models[2]:-$default_editor}"
+
+    local model_flag weak_flag editor_flag
+
+    # --model
+    if _is_claude_model "$model"; then
+        model_flag="--model=anthropic/${model}"
+    else
+        if [[ "$service" == "blablador" ]]; then
+            model_flag="--model=openai/alias-${model}"
+        else
+            model_flag="--model=openai/${model}"
+        fi
+    fi
+
+    # --weak-model
+    if _is_claude_model "$weak"; then
+        weak_flag="--weak-model=anthropic/${weak}"
+    else
+        if [[ "$service" == "blablador" ]]; then
+            weak_flag="--weak-model=openai/alias-${weak}"
+        else
+            weak_flag="--weak-model=openai/${weak}"
+        fi
+    fi
+
+    # --editor-model
+    if _is_claude_model "$editor"; then
+        editor_flag="--editor-model=anthropic/${editor}"
+    else
+        if [[ "$service" == "blablador" ]]; then
+            editor_flag="--editor-model=openai/alias-${editor}"
+        else
+            editor_flag="--editor-model=openai/${editor}"
+        fi
+    fi
+
+    echo "$model_flag $weak_flag $editor_flag"
+}
+
+# ---------------------------------------------------------------------------
+# _aider_openai
+# Description: Common logic for running aider with an OpenAI-compatible service
+#              (DESY or Blablador). Takes a service name and up to 3 model
+#              names, then any additional aider flags.
+# Usage:       _aider_openai <service> [model1] [model2] [model3] [aider options...]
+# Arguments:   $1 - Service name ('desy' or 'blablador').
+#              $2..$4 - Up to 3 model names (optional). Arguments starting
+#                       with '-' are treated as flags and stop positional parsing.
+#              $@ - Additional arguments forwarded to 'aider'.
+# Returns:     Exits with the return code of the 'aider' command.
+# ---------------------------------------------------------------------------
+_aider_openai() {
+    local openai_service="$1"
+    shift
+
+    check_for_aider_confs
+
+    # Build the API keys dict and retrieve keys
+    local -A api_key_dict=( ["$openai_service"]="" ["claude"]="" )
+    _get_api_keys api_key_dict || return 1
+    _check_update_descriptions api_key_dict
+
+    local flags
+    flags=$( _get_api_key_flags api_key_dict ) || return 1
+    flags+=" --openai-api-base="$( get_service_url $openai_service )" "
+
+    # Collect up to 3 positional model arguments (non-flag)
+    local models=()
+    while [[ $# -gt 0 && ! "$1" =~ ^- ]]; do
+        models+=("$1")
+        shift
+        # Stop after collecting 3
+        if [[ ${#models[@]} -eq 3 ]]; then
+            break
+        fi
+    done
+
+    flags+=$( _get_model_flags_by_service "$openai_service" "${models[@]}" )
+    flags+="$@"
+
+    conda activate aider
+    PYTHONPATH=${PYTHONPATH}:${aider_repository_dir} python -m aider $flags
+}
+
+
 # ---------------------------------------------------------------------------
 # aider_blablador
 # Description: Wrapper around the 'aider' tool configured for the Blablador
@@ -368,42 +580,7 @@ check_for_aider_confs() {
 # Returns:     Exits with the return code of the 'aider' command.
 # ---------------------------------------------------------------------------
 aider_blablador() {
-    local service="blablador"
-
-    check_for_aider_confs
-
-    # Build the API keys dict and retrieve keys
-    local -A api_key_dict=( ["$service"]="" )
-    _get_api_keys api_key_dict || return 1
-    _check_update_descriptions api_key_dict
-
-    local flags
-    flags=$( _get_api_key_flags api_key_dict ) || return 1
-    flags+=" --openai-api-base="$( get_service_url $service )" "
-
-    # Collect up to 3 positional model arguments (non-flag)
-    local models=()
-    while [[ $# -gt 0 && ! "$1" =~ ^- ]]; do
-        models+=("$1")
-        shift
-        # Stop after collecting 3
-        if [[ ${#models[@]} -eq 3 ]]; then
-            break
-        fi
-    done
-
-    # Assign defaults for missing positions
-    local model="${models[0]:-huge}"
-    local weak_model="${models[1]:-fast}"
-    local editor_model="${models[2]:-code}"
-
-    flags+=" --model=openai/alias-${model} " 
-    flags+=" --weak-model=openai/alias-${weak_model} " 
-    flags+=" --editor-model=openai/alias-${editor_model} " 
-    flags+="$@"
-
-    conda activate aider
-    PYTHONPATH=${PYTHONPATH}:${aider_repository_dir} python -m aider $flags
+    _aider_openai blablador "$@"
 }
 
 
@@ -423,48 +600,5 @@ aider_blablador() {
 # Returns:     Exits with the return code of the 'aider' command.
 # ---------------------------------------------------------------------------
 aider_desy() {
-    local service="desy"
-
-    check_for_aider_confs
-
-    # Build the API keys dict and retrieve keys
-    local -A api_key_dict=( ["$service"]="" )
-    _get_api_keys api_key_dict || return 1
-    _check_update_descriptions api_key_dict
-
-    local flags
-    flags=$( _get_api_key_flags api_key_dict ) || return 1
-    flags+=" --openai-api-base="$( get_service_url $service )" "
-
-    # Collect up to 3 positional model arguments (non-flag)
-    local models=()
-    while [[ $# -gt 0 && ! "$1" =~ ^- ]]; do
-        models+=("$1")
-        shift
-        # Stop after collecting 3
-        if [[ ${#models[@]} -eq 3 ]]; then
-            break
-        fi
-    done
-
-    # Assign defaults for missing positions
-    local model="${models[0]:-reasoning}"
-    local weak_model="${models[1]:-desy-assistant}"
-    local editor_model="${models[2]:-coding}"
-    
-    flags+=" --model=openai/${model} " 
-    flags+=" --weak-model=openai/${weak_model} " 
-    flags+=" --editor-model=openai/${editor_model} " 
-    flags+="$@"
-
-    conda activate aider
-    #PYTHONPATH=${PYTHONPATH}:${aider_repository_dir} python -m aider $flags
-    echo $flags
+    _aider_openai desy "$@"
 }
-
-#_aider_openai() {
-#    # aider_blablador and aider_desy are repetative, I want to extract the common logic.
-#    # this function should take a service name, three default models and then all the arguments given to the aider_desy or aider_blablador function, and then perform the same function as either of them. AI!
-#    local service="$1"
-#    shift
-#}

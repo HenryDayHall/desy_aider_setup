@@ -10,6 +10,11 @@ This should be extendable, so that additional tweaks can be considered in the fu
 
 This should be learnt from reinforcement learning.
 
+## Edit
+
+Have a base rate guess, that guesses the difficulty and the number of tokens.
+Then each conditioned thing is a multiplier of this base.
+Encourages the per model architectures to learn about the relationship between model and prompt, rather than just task difficulty.
 
 ## Imagined inference
 
