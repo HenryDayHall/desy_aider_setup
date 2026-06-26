@@ -9,6 +9,7 @@
 
 # folder that stores descriptions of the models avaliable from each service
 service_descriptions_folder="/home/henry/DESY_sync/Documents/Assistant/service_descriptions"
+aider_repository_dir="home/henry/DESY_sync/Documents/Assistant/aider_repo"
 
 # ---------------------------------------------------------------------------
 # get_password
@@ -85,7 +86,7 @@ _get_api_key_flags() {
     for name in "${!_keys_dict[@]}"; do
         local key="${_keys_dict[$name]}"
         case "$name" in
-            anthropic)   flags="$flags --anthropic-api-key=$key" ;;
+            claude)   flags="$flags --anthropic-api-key=$key" ;;
             blablador)   flags="$flags --openai-api-key=$key" ;;
             desy)        flags="$flags --openai-api-key=$key" ;;
             *)           flags="$flags --${name}-api-key=$key" ;;
@@ -118,7 +119,17 @@ get_current_description() {
     local url=$( get_service_url "$service" )
     # Append /models to get the list of available models
     local models_url="${url}models"
-    local description=$( curl -s "$models_url" -H "Authorization: Bearer $key" )
+
+    # Build curl arguments
+    local curl_args=(-s "$models_url" -H "Authorization: Bearer $key")
+    if [[ "$service" == "claude" ]]; then
+        curl_args+=(-H "x-api-key: $key")
+        curl_args+=(-H "anthropic-version: 2023-06-01")
+    else
+        curl_args+=(-H "Authorization: Bearer $key")
+    fi
+
+    local description=$( curl "${curl_args[@]}" )
     echo "$description"
 }
 
@@ -202,6 +213,8 @@ check_update_descriptions() {
     if [[ ${#key_dict[@]} -eq 0 ]]; then
         key_dict["desy"]=""
         key_dict["blablador"]=""
+
+        echo "Not updating claude without explicit instructions due to token cost"
     fi
 
     _get_api_keys key_dict
@@ -226,6 +239,7 @@ get_service_url() {
    case "$1" in
        blablador)   url="https://api.helmholtz-blablador.fz-juelich.de/v1/" ;;
        desy)        url="https://assistant.desy.de/api/" ;;
+       claude)      url="https://api.anthropic.com/v1/" ;;
    esac
    if [[ -z "$url" ]]; then
        echo "Don't have a url for service named "
@@ -267,6 +281,7 @@ for item in data.get('data', []):
 # Notes:       For 'aider_desy' it lists all models from the DESY service.
 #              For 'aider_blablador' it lists only models whose ID starts with
 #              'alias-', stripping the prefix.
+#              Autocomplete is provided for up to 3 positional arguments.
 # ---------------------------------------------------------------------------
 _aider_models_complete() {
     local cur cmd models
@@ -291,8 +306,8 @@ _aider_models_complete() {
         models=()
     fi
 
-    # Only autocomplete the first argument (the model name)
-    if [[ $COMP_CWORD -eq 1 ]]; then
+    # Autocomplete up to 3 positional arguments (model names)
+    if [[ $COMP_CWORD -ge 1 && $COMP_CWORD -le 3 ]]; then
         COMPREPLY=( $(compgen -W "${models[*]}" -- "$cur") )
         return 0
     fi
@@ -301,23 +316,61 @@ _aider_models_complete() {
 # Register autocomplete for both commands
 complete -F _aider_models_complete aider_desy aider_blablador
 
+#--cache-prompts \  # only works on some apis
+#--no-stream \  # needed to see cache statistics and costs
+
+# consider leaving these to .aider.conf.yml
+default_aider_flags() {
+    echo "  --no-auto-commits \
+            --watch-files \
+            --dark-mode \
+            --editor vim \
+            --shell-completions bash \
+            --read CONVENTIONS.md \
+            --vim "
+}
+
+
+# Check to see if confs are found
+check_for_aider_confs() {
+    _git_root=$(git rev-parse --show-toplevel 2>/dev/null)
+
+    if [ ! -f ~/.aider.conf.yml ] \
+      && { [ -z "$_git_root" ] || [ ! -f "$_git_root/.aider.conf.yml" ]; } \
+      && [ ! -f ./.aider.conf.yml ]; then
+      echo "No .aider.conf.yml found in any expected location"
+      echo "Did you pass one as a flag?"
+      echo "Otherwise, consider applying default_aider_flags"
+    fi
+
+    if [ ! -f ~/.aider.model.settings.yml ] \
+      && { [ -z "$_git_root" ] || [ ! -f "$_git_root/.aider.model.settings.yml" ]; } \
+      && [ ! -f ./.aider.model.settings.yml ]; then
+      echo "No .aider.model.settings.yml found in any expected location"
+      echo "Did you pass one as a flag?"
+    fi
+}
+
 # ---------------------------------------------------------------------------
 # aider_blablador
 # Description: Wrapper around the 'aider' tool configured for the Blablador
 #              service. Automatically retrieves the API key, checks for model
 #              description updates, and passes appropriate flags.
-# Usage:       aider_blablador [model] [aider options...]
-# Arguments:   $1 - Model name (default: 'fast'). The 'alias-' prefix is
-#                   automatically prepended.
+# Usage:       aider_blablador [model1] [model2] [model3] [aider options...]
+#              Up to 3 positional model names can be given (non-flag arguments).
+#              They are assigned to --model, --weak-model, --editor-model
+#              respectively. Defaults: --model=huge, --weak-model=fast,
+#              --editor-model=code. The 'alias-' prefix is automatically
+#              prepended to each model name.
+# Arguments:   $1..$3 - Model names (optional). Arguments starting with '-'
+#                       are treated as flags and stop positional parsing.
 #              $@ - Additional arguments forwarded to 'aider'.
 # Returns:     Exits with the return code of the 'aider' command.
 # ---------------------------------------------------------------------------
 aider_blablador() {
     local service="blablador"
 
-    # First argument can specify the model to use; defaults to "fast"
-    local model="${1:-fast}"
-    shift
+    check_for_aider_confs
 
     # Build the API keys dict and retrieve keys
     local -A api_key_dict=( ["$service"]="" )
@@ -326,34 +379,53 @@ aider_blablador() {
 
     local flags
     flags=$( _get_api_key_flags api_key_dict ) || return 1
-    aider $flags \
-        --openai-api-base=$( get_service_url $service ) \
-        --model="openai/alias-${model}"\
-        --no-auto-commits \
-        --watch-files \
-        --read CONVENTIONS.md \
-        --vim \
-        "$@"
+    flags+=" --openai-api-base="$( get_service_url $service )" "
+
+    # Collect up to 3 positional model arguments (non-flag)
+    local models=()
+    while [[ $# -gt 0 && ! "$1" =~ ^- ]]; do
+        models+=("$1")
+        shift
+        # Stop after collecting 3
+        if [[ ${#models[@]} -eq 3 ]]; then
+            break
+        fi
+    done
+
+    # Assign defaults for missing positions
+    local model="${models[0]:-huge}"
+    local weak_model="${models[1]:-fast}"
+    local editor_model="${models[2]:-code}"
+
+    flags+=" --model=openai/alias-${model} " 
+    flags+=" --weak-model=openai/alias-${weak_model} " 
+    flags+=" --editor-model=openai/alias-${editor_model} " 
+    flags+="$@"
+
+    conda activate aider
+    PYTHONPATH=${PYTHONPATH}:${aider_repository_dir} python -m aider $flags
 }
 
-#--cache-prompts \  # only works on some apis
-#--no-stream \  # needed to see cache statistics and costs
 
 # ---------------------------------------------------------------------------
 # aider_desy
 # Description: Wrapper around the 'aider' tool configured for the DESY service.
 #              Automatically retrieves the API key, checks for model description
 #              updates, and passes appropriate flags.
-# Usage:       aider_desy [model] [aider options...]
-# Arguments:   $1 - Model name (default: 'coding').
+# Usage:       aider_desy [model1] [model2] [model3] [aider options...]
+#              Up to 3 positional model names can be given (non-flag arguments).
+#              They are assigned to --model, --weak-model, --editor-model
+#              respectively. Defaults: --model=reasoning,
+#              --weak-model=desy-assistant, --editor-model=coding.
+# Arguments:   $1..$3 - Model names (optional). Arguments starting with '-'
+#                       are treated as flags and stop positional parsing.
 #              $@ - Additional arguments forwarded to 'aider'.
 # Returns:     Exits with the return code of the 'aider' command.
 # ---------------------------------------------------------------------------
 aider_desy() {
     local service="desy"
-    # First argument can specify the model to use; defaults to "coding"
-    local model="${1:-coding}"
-    shift
+
+    check_for_aider_confs
 
     # Build the API keys dict and retrieve keys
     local -A api_key_dict=( ["$service"]="" )
@@ -362,12 +434,37 @@ aider_desy() {
 
     local flags
     flags=$( _get_api_key_flags api_key_dict ) || return 1
-    aider $flags \
-        --openai-api-base=$( get_service_url $service )\
-        --model="openai/${model}"\
-        --no-auto-commits \
-        --watch-files \
-        --read CONVENTIONS.md \
-        --vim \
-        "$@"
+    flags+=" --openai-api-base="$( get_service_url $service )" "
+
+    # Collect up to 3 positional model arguments (non-flag)
+    local models=()
+    while [[ $# -gt 0 && ! "$1" =~ ^- ]]; do
+        models+=("$1")
+        shift
+        # Stop after collecting 3
+        if [[ ${#models[@]} -eq 3 ]]; then
+            break
+        fi
+    done
+
+    # Assign defaults for missing positions
+    local model="${models[0]:-reasoning}"
+    local weak_model="${models[1]:-desy-assistant}"
+    local editor_model="${models[2]:-coding}"
+    
+    flags+=" --model=openai/${model} " 
+    flags+=" --weak-model=openai/${weak_model} " 
+    flags+=" --editor-model=openai/${editor_model} " 
+    flags+="$@"
+
+    conda activate aider
+    #PYTHONPATH=${PYTHONPATH}:${aider_repository_dir} python -m aider $flags
+    echo $flags
 }
+
+#_aider_openai() {
+#    # aider_blablador and aider_desy are repetative, I want to extract the common logic.
+#    # this function should take a service name, three default models and then all the arguments given to the aider_desy or aider_blablador function, and then perform the same function as either of them. AI!
+#    local service="$1"
+#    shift
+#}
