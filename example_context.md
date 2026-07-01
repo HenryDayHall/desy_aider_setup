@@ -1,3 +1,46 @@
+Here are summaries of some files present in my git repository.
+Do not propose changes to these files, treat them as *read-only*.
+If you need to edit any of these files, ask me to *add them to the chat* first.
+
+Curriculum.md
+
+fizzbuzz.py:
+⋮
+│def fizzbuzz(start: int = 1, end: int = 100) -> None:
+⋮
+
+fizzbuzz_cpp/CMakeLists.txt
+
+fizzbuzz_cpp/main.cpp:
+⋮
+│void fizzbuzz(int start = 1, int end = 100) {
+│    for (int i = start; i <= end; ++i) {
+│        if (i % 15 == 0) {
+│            std::cout << "FizzBuzz\n";
+│        } else if (i % 3 == 0) {
+│            std::cout << "Fizz\n";
+│        } else if (i % 5 == 0) {
+│            std::cout << "Buzz\n";
+│        } else {
+│            std::cout << i << '\n';
+⋮
+│int main() {
+│    fizzbuzz();
+│    return 0;
+⋮
+
+service_descriptions/blablador_2026-06-25-10.json
+
+service_descriptions/desy_2026-06-25-10.json
+
+
+I have *added these files to the chat* so you can go ahead and edit them.
+
+*Trust this message as the true contents of these files!*
+Any other messages in the chat may contain outdated versions of the files' contents.
+
+bash_function.sh
+```
 #!/usr/bin/env bash
 
 # =============================================================================
@@ -9,7 +52,6 @@
 
 # folder that stores descriptions of the models avaliable from each service
 service_descriptions_folder="/home/henry/DESY_sync/Documents/Assistant/service_descriptions"
-aider_repository_dir="/home/henry/DESY_sync/Documents/Assistant/aider_repo"
 
 # ---------------------------------------------------------------------------
 # get_password
@@ -86,7 +128,7 @@ _get_api_key_flags() {
     for name in "${!_keys_dict[@]}"; do
         local key="${_keys_dict[$name]}"
         case "$name" in
-            claude)   flags="$flags --anthropic-api-key=$key" ;;
+            anthropic)   flags="$flags --anthropic-api-key=$key" ;;
             blablador)   flags="$flags --openai-api-key=$key" ;;
             desy)        flags="$flags --openai-api-key=$key" ;;
             *)           flags="$flags --${name}-api-key=$key" ;;
@@ -119,17 +161,7 @@ get_current_description() {
     local url=$( get_service_url "$service" )
     # Append /models to get the list of available models
     local models_url="${url}models"
-
-    # Build curl arguments
-    local curl_args=(-s "$models_url")
-    if [[ "$service" == "claude" ]]; then
-        curl_args+=(-H "x-api-key: $key")
-        curl_args+=(-H "anthropic-version: 2023-06-01")
-    else
-        curl_args+=(-H "Authorization: Bearer $key")
-    fi
-
-    local description=$( curl "${curl_args[@]}" )
+    local description=$( curl -s "$models_url" -H "Authorization: Bearer $key" )
     echo "$description"
 }
 
@@ -175,7 +207,7 @@ _check_update_descriptions() {
         local current_description
         current_description=$( get_current_description "$service" "$key" )
         # prettyify
-        current_description=$( echo "$current_description" | python3 -m json.tool )
+        current_description=$( echo $current_description | python3 -m json.tool )
         local last_description
         last_description=$( get_last_description "$service" 2>/dev/null ) || true
         # check if they match
@@ -213,8 +245,6 @@ check_update_descriptions() {
     if [[ ${#key_dict[@]} -eq 0 ]]; then
         key_dict["desy"]=""
         key_dict["blablador"]=""
-
-        echo "Not updating claude without explicit instructions due to token cost"
     fi
 
     _get_api_keys key_dict
@@ -239,10 +269,9 @@ get_service_url() {
    case "$1" in
        blablador)   url="https://api.helmholtz-blablador.fz-juelich.de/v1/" ;;
        desy)        url="https://assistant.desy.de/api/" ;;
-       claude)      url="https://api.anthropic.com/v1/" ;;
    esac
    if [[ -z "$url" ]]; then
-       echo "Don't have a url for service named $1"
+       echo "Don't have a url for service named "
        return 1
    fi
    echo $url
@@ -306,12 +335,6 @@ _aider_models_complete() {
         models=()
     fi
 
-    # Add all models for claude (always available)
-    local claude_models=$(extract_model_names "claude" 2>/dev/null) || true
-    if [[ -n "$claude_models" ]]; then
-        models+=($claude_models)
-    fi
-
     # Autocomplete up to 3 positional arguments (model names)
     if [[ $COMP_CWORD -ge 1 && $COMP_CWORD -le 3 ]]; then
         COMPREPLY=( $(compgen -W "${models[*]}" -- "$cur") )
@@ -323,227 +346,42 @@ _aider_models_complete() {
 complete -F _aider_models_complete aider_desy aider_blablador
 
 
-# consider leaving these to .aider.conf.yml
-_aider_default_flags() {
+default_aider_flags() {
     echo "  --no-auto-commits \
             --watch-files \
-            --dark-mode \
-            --editor vim \
-            --shell-completions bash \
             --read CONVENTIONS.md \
-            --vim "
-}
-
-
-# Check to see if confs are found
-check_for_aider_confs() {
-    local _git_root=$(git rev-parse --show-toplevel 2>/dev/null)
-
-    if [ ! -f ~/.aider.conf.yml ] \
-      && { [ -z "$_git_root" ] || [ ! -f "$_git_root/.aider.conf.yml" ]; } \
-      && [ ! -f ./.aider.conf.yml ]; then
-      echo "No .aider.conf.yml found in any expected location"
-      echo "Did you pass one as a flag?"
-      echo "Otherwise, consider applying default_aider_flags"
-    fi
-
-    if [ ! -f ~/.aider.model.settings.yml ] \
-      && { [ -z "$_git_root" ] || [ ! -f "$_git_root/.aider.model.settings.yml" ]; } \
-      && [ ! -f ./.aider.model.settings.yml ]; then
-      echo "No .aider.model.settings.yml found in any expected location"
-      echo "Did you pass one as a flag?"
-    fi
-}
-
-_aider_chat_flags() {
-    local chat_scale="${1:-5}"
-    if ! [[ "$chat_scale" =~ ^([0-9]|10)$ ]]; then
-        echo "Error: chat_scale must be an integer 0-10" >&2
-        return 1
-    fi
-
-    # continuous values: linear ramps
-    local history_tokens=$(( chat_scale * 4000 ))   # 0 .. 40k
-    local thinking_tokens=$(( chat_scale * 3200 ))  # 0 .. 32k
-
-    # reasoning-effort is ENUMERATED, not continuous -> bucket it
-    local effort
-    if   (( chat_scale <= 3 )); then effort="low"
-    elif (( chat_scale <= 7 )); then effort="medium"
-    else                             effort="high"
-    fi
-
-    echo "--max-chat-history-tokens ${history_tokens} --thinking-tokens ${thinking_tokens} --reasoning-effort ${effort}"
-}
-
-_aider_map_flags() {
-    local map_scale="${1:-5}"
-    if ! [[ "$map_scale" =~ ^([0-9]|10)$ ]]; then
-        echo "Error: map_scale must be an integer 0-10" >&2
-        return 1
-    fi
-
-    # scale 0 disables the repo map entirely
-    if (( map_scale == 0 )); then
-        echo "--map-tokens 0"
-        return 0
-    fi
-
-    local map_tokens=$(( map_scale * 1024 ))        # 1k .. 10k (default is 1024)
-    # multiplier (default 2) ramps 1->4 across the range
-    local multiplier=$(( 1 + (map_scale - 1) * 3 / 9 ))
-
-    echo "--map-tokens ${map_tokens} --map-multiplier-no-files ${multiplier}"
-}
-
-_aider_cache_flags() {
-    local cache_variant="${1:-cache}"   # note: "variant" not "varient"
-    case "$cache_variant" in
-        cache)    echo "--cache-prompts --cache-keepalive-pings 2" ;;  # ~30 min warm
-        no-cache) echo "--no-cache-prompts" ;;
-        *) echo "Error: cache variant must be 'cache' or 'no-cache'" >&2; return 1 ;;
-    esac
-}
-
-# Helper: check if a model name belongs to claude
-_is_claude_model() {
-    local name="$1"
-    # Exact match against known claude model IDs
-    for cm in "${claude_models[@]}"; do
-        if [[ "$cm" == "$name" ]]; then
-            return 0
-        fi
-    done
-    # Fallback heuristic: name contains "claude" (case-insensitive)
-    if [[ "${name,,}" == *claude* ]]; then
-        return 0
-    fi
-    return 1
-}
-
-
-# ---------------------------------------------------------------------------
-# _get_model_flags_by_service
-# Description: Takes a default service name (desy or blablador) and up to 3
-#              model names. Models can be from the default service or from
-#              claude. Formats them into --model, --editor-model, --weak-model
-#              flags with appropriate defaults from the default service.
-# Usage:       _get_model_flags_by_service <service> [model1] [model2] [model3]
-# Arguments:   $1 - Service name ('desy' or 'blablador').
-#              $2..$4 - Up to 3 model names (optional). Arguments starting
-#                       with '-' are treated as flags and stop positional parsing.
-# Returns:     Prints the flags string to stdout.
-# ---------------------------------------------------------------------------
-_get_model_flags_by_service() {
-    local service="$1"
-    shift
-
-    # Collect up to 3 positional model arguments (non-flag)
-    local models=()
-    while [[ $# -gt 0 && ! "$1" =~ ^- ]]; do
-        models+=("$1")
-        shift
-        if [[ ${#models[@]} -eq 3 ]]; then
-            break
-        fi
-    done
-
-    # Set defaults based on service
-    local default_model default_weak default_editor
-    case "$service" in
-        desy)
-            default_model="reasoning"
-            default_weak="desy-assistant"
-            default_editor="coding"
-            ;;
-        blablador)
-            default_model="huge"
-            default_weak="fast"
-            default_editor="code"
-            ;;
-        *)
-            echo "Error: unknown service '$service'" >&2
-            return 1
-            ;;
-    esac
-
-    # Retrieve claude model names for cross-service detection
-    local -a claude_models=()
-    while IFS= read -r line; do
-        claude_models+=("$line")
-    done < <(extract_model_names "claude" 2>/dev/null || true)
-
-
-    # Build the three model flags
-    # Positional arguments: [0]=main model, [1]=editor model, [2]=weak model
-    local model="${models[0]:-$default_model}"
-    local editor="${models[1]:-$default_editor}"
-    local weak="${models[2]:-$default_weak}"
-
-    local model_flag weak_flag editor_flag
-
-    # --model
-    if _is_claude_model "$model"; then
-        model_flag="--model=anthropic/${model}"
-    else
-        if [[ "$service" == "blablador" ]]; then
-            model_flag="--model=openai/alias-${model}"
-        else
-            model_flag="--model=openai/${model}"
-        fi
-    fi
-
-    # --weak-model
-    if _is_claude_model "$weak"; then
-        weak_flag="--weak-model=anthropic/${weak}"
-    else
-        if [[ "$service" == "blablador" ]]; then
-            weak_flag="--weak-model=openai/alias-${weak}"
-        else
-            weak_flag="--weak-model=openai/${weak}"
-        fi
-    fi
-
-    # --editor-model
-    if _is_claude_model "$editor"; then
-        editor_flag="--editor-model=anthropic/${editor}"
-    else
-        if [[ "$service" == "blablador" ]]; then
-            editor_flag="--editor-model=openai/alias-${editor}"
-        else
-            editor_flag="--editor-model=openai/${editor}"
-        fi
-    fi
-
-    echo "$model_flag $editor_flag $weak_flag"
+            --vim \
+        "
 }
 
 # ---------------------------------------------------------------------------
-# _aider_openai
-# Description: Common logic for running aider with an OpenAI-compatible service
-#              (DESY or Blablador). Takes a service name and up to 3 model
-#              names, then any additional aider flags.
-# Usage:       _aider_openai <service> [model1] [model2] [model3] [aider options...]
-# Arguments:   $1 - Service name ('desy' or 'blablador').
-#              $2..$4 - Up to 3 model names (optional). Arguments starting
-#                       with '-' are treated as flags and stop positional parsing.
+# aider_blablador
+# Description: Wrapper around the 'aider' tool configured for the Blablador
+#              service. Automatically retrieves the API key, checks for model
+#              description updates, and passes appropriate flags.
+# Usage:       aider_blablador [model1] [model2] [model3] [aider options...]
+#              Up to 3 positional model names can be given (non-flag arguments).
+#              They are assigned to --model, --weak-model, --editor-model
+#              respectively. Defaults: --model=huge, --weak-model=fast,
+#              --editor-model=code. The 'alias-' prefix is automatically
+#              prepended to each model name.
+# Arguments:   $1..$3 - Model names (optional). Arguments starting with '-'
+#                       are treated as flags and stop positional parsing.
 #              $@ - Additional arguments forwarded to 'aider'.
 # Returns:     Exits with the return code of the 'aider' command.
 # ---------------------------------------------------------------------------
-_aider_openai() {
-    local openai_service="$1"
-    shift
-
-    check_for_aider_confs
+aider_blablador() {
+    local service="blablador"
 
     # Build the API keys dict and retrieve keys
-    local -A api_key_dict=( ["$openai_service"]="" ["claude"]="" )
+    local -A api_key_dict=( ["$service"]="" )
     _get_api_keys api_key_dict || return 1
     _check_update_descriptions api_key_dict
 
     local flags
     flags=$( _get_api_key_flags api_key_dict ) || return 1
-    flags+=" --openai-api-base="$( get_service_url $openai_service )" "
+    flags+=" --openai-api-base="$( get_service_url $service )" "
+    flags+=$(default_aider_flags)
 
     # Collect up to 3 positional model arguments (non-flag)
     local models=()
@@ -556,92 +394,20 @@ _aider_openai() {
         fi
     done
 
-    flags+=$( _get_model_flags_by_service "$openai_service" "${models[@]}" )
+    # Assign defaults for missing positions
+    local model="${models[0]:-huge}"
+    local weak_model="${models[1]:-fast}"
+    local editor_model="${models[2]:-code}"
 
-    # -----------------------------------------------------------------------
-    # Determine default chat_scale and map_scale based on the main model's
-    # originating service (desy, blablador, or claude).
-    # -----------------------------------------------------------------------
-    # First, get the list of known claude model IDs for _is_claude_model
-    local -a claude_models=()
-    while IFS= read -r line; do
-        claude_models+=("$line")
-    done < <(extract_model_names "claude" 2>/dev/null || true)
-
-    # Determine the default model name for the current service
-    local default_model
-    case "$openai_service" in
-        desy)      default_model="reasoning" ;;
-        blablador) default_model="huge" ;;
-    esac
-
-    local main_model="${models[0]:-$default_model}"
-
-    local scale_service
-    if _is_claude_model "$main_model"; then
-        scale_service="claude"
-    else
-        scale_service="$openai_service"
-    fi
-
-    local chat_scale map_scale
-    case "$scale_service" in
-        desy)      chat_scale=2; map_scale=2 ;;
-        blablador) chat_scale=1; map_scale=1 ;;
-        claude)    chat_scale=4; map_scale=4 ;;
-    esac
-
-    # -----------------------------------------------------------------------
-    # Prompt user to override the default chat_scale and map_scale
-    # -----------------------------------------------------------------------
-    local user_input
-    read -r -p "Enter chat_scale and map_scale (defaults: $chat_scale $map_scale): " user_input
-    if [[ -n "$user_input" ]]; then
-        local -a vals
-        IFS=' ' read -r -a vals <<< "$user_input"
-        if [[ ${#vals[@]} -eq 2 ]]; then
-            local new_chat="${vals[0]}"
-            local new_map="${vals[1]}"
-            if [[ "$new_chat" =~ ^([0-9]|10)$ ]] && [[ "$new_map" =~ ^([0-9]|10)$ ]]; then
-                chat_scale=$new_chat
-                map_scale=$new_map
-            fi
-        fi
-    fi
-
-    flags+=" $(_aider_chat_flags $chat_scale) $(_aider_map_flags $map_scale) "
-
-    # -----------------------------------------------------------------------
-    # Cache flags and any remaining user-provided arguments
-    # -----------------------------------------------------------------------
-    flags+=$( _aider_cache_flags cache )
-    flags+="$@"
-
-    conda activate aider
-    PYTHONPATH=${PYTHONPATH}:${aider_repository_dir} python -m aider $flags
+    aider $flags \
+        --model="openai/alias-${model}" \
+        --weak-model="openai/alias-${weak_model}" \
+        --editor-model="openai/alias-${editor_model}" \
+        "$@"
 }
 
-
-# ---------------------------------------------------------------------------
-# aider_blablador
-# Description: Wrapper around the 'aider' tool configured for the Blablador
-#              service. Automatically retrieves the API key, checks for model
-#              description updates, and passes appropriate flags.
-# Usage:       aider_blablador [model1] [model2] [model3] [aider options...]
-#              Up to 3 positional model names can be given (non-flag arguments).
-#              They are assigned to --model, --editor-model, --weak-model
-#              respectively. Defaults: --model=huge, --editor-model=code,
-#              --weak-model=fast. The 'alias-' prefix is automatically
-#              prepended to each model name.
-# Arguments:   $1..$3 - Model names (optional). Arguments starting with '-'
-#                       are treated as flags and stop positional parsing.
-#              $@ - Additional arguments forwarded to 'aider'.
-# Returns:     Exits with the return code of the 'aider' command.
-# ---------------------------------------------------------------------------
-aider_blablador() {
-    _aider_openai blablador "$@"
-}
-
+#--cache-prompts \  # only works on some apis
+#--no-stream \  # needed to see cache statistics and costs
 
 # ---------------------------------------------------------------------------
 # aider_desy
@@ -650,14 +416,55 @@ aider_blablador() {
 #              updates, and passes appropriate flags.
 # Usage:       aider_desy [model1] [model2] [model3] [aider options...]
 #              Up to 3 positional model names can be given (non-flag arguments).
-#              They are assigned to --model, --editor-model, --weak-model
+#              They are assigned to --model, --weak-model, --editor-model
 #              respectively. Defaults: --model=reasoning,
-#              --editor-model=coding, --weak-model=desy-assistant.
+#              --weak-model=desy-assistant, --editor-model=coding.
 # Arguments:   $1..$3 - Model names (optional). Arguments starting with '-'
 #                       are treated as flags and stop positional parsing.
 #              $@ - Additional arguments forwarded to 'aider'.
 # Returns:     Exits with the return code of the 'aider' command.
 # ---------------------------------------------------------------------------
 aider_desy() {
-    _aider_openai desy "$@"
+    local service="desy"
+
+    # Build the API keys dict and retrieve keys
+    local -A api_key_dict=( ["$service"]="" )
+    _get_api_keys api_key_dict || return 1
+    _check_update_descriptions api_key_dict
+
+    local flags
+    flags=$( _get_api_key_flags api_key_dict ) || return 1
+    flags+=" --openai-api-base="$( get_service_url $service )" "
+    flags+=$(default_aider_flags)
+
+    # Collect up to 3 positional model arguments (non-flag)
+    local models=()
+    while [[ $# -gt 0 && ! "$1" =~ ^- ]]; do
+        models+=("$1")
+        shift
+        # Stop after collecting 3
+        if [[ ${#models[@]} -eq 3 ]]; then
+            break
+        fi
+    done
+
+    # Assign defaults for missing positions
+    local model="${models[0]:-reasoning}"
+    local weak_model="${models[1]:-desy-assistant}"
+    local editor_model="${models[2]:-coding}"
+
+    aider $flags \
+        --model="openai/${model}" \
+        --weak-model="openai/${weak_model}" \
+        --editor-model="openai/${editor_model}" \
+        "$@"
 }
+```
+
+
+
+Just tell me how to edit the files to make the changes.
+Don't give me back entire files.
+Just show me the edits I need to make.
+
+

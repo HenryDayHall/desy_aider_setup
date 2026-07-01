@@ -1,0 +1,587 @@
+{
+    "data": [
+        {
+            "id": "desy-assistant",
+            "name": "DESY Assistant Base",
+            "owned_by": "openai",
+            "openai": {
+                "id": "desy-assistant",
+                "name": "desy-assistant",
+                "owned_by": "openai",
+                "openai": {
+                    "id": "desy-assistant"
+                },
+                "urlIdx": 0,
+                "connection_type": "local"
+            },
+            "urlIdx": 0,
+            "connection_type": "local",
+            "info": {
+                "id": "desy-assistant",
+                "user_id": "93ec1756-a29b-4a1b-82ee-9e333c318363",
+                "base_model_id": null,
+                "name": "DESY Assistant Base",
+                "meta": {
+                    "description": "API name: desy-assistant\nDocumentation: https://it.desy.de/dienste/desy_assistant/index_ger.html\nInfo: Currently based on mistralai/Mistral-Medium-3.5-128B and preconfigured to act as DESY Assistant.\nWithout specialised DESY knowledge.",
+                    "capabilities": {
+                        "file_context": true,
+                        "vision": true,
+                        "file_upload": true,
+                        "web_search": true,
+                        "image_generation": true,
+                        "code_interpreter": false,
+                        "terminal": false,
+                        "citations": true,
+                        "status_updates": true,
+                        "usage": false,
+                        "builtin_tools": true
+                    },
+                    "tags": [],
+                    "filterIds": [
+                        "disable_auto_tools",
+                        "usage_tracker",
+                        "auto_tools"
+                    ],
+                    "suggestion_prompts": null,
+                    "defaultFilterIds": [
+                        "auto_tools"
+                    ],
+                    "toolIds": [
+                        "fetch_xwiki_url",
+                        "calculator",
+                        "create_document",
+                        "deep_research"
+                    ],
+                    "builtinTools": {
+                        "chats": false,
+                        "calendar": false,
+                        "automations": false,
+                        "knowledge": false,
+                        "channels": false,
+                        "code_interpreter": false
+                    }
+                },
+                "access_grants": [
+                    {
+                        "id": "60767650-c4ad-458a-a6bb-799873014347",
+                        "resource_type": "model",
+                        "resource_id": "desy-assistant",
+                        "principal_type": "user",
+                        "principal_id": "*",
+                        "permission": "read",
+                        "created_at": 1781764623
+                    }
+                ],
+                "is_active": true,
+                "updated_at": 1781764623,
+                "created_at": 1731917542
+            },
+            "actions": [],
+            "filters": [
+                {
+                    "id": "auto_tools",
+                    "name": "Auto Tools",
+                    "description": "Automatically select tools",
+                    "icon": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIiB2ZXJzaW9uPSIxLjEiIHdpZHRoPSIyNTYiIGhlaWdodD0iMjU2IiB2aWV3Qm94PSIwIDAgMjU2IDI1NiIgeG1sOnNwYWNlPSJwcmVzZXJ2ZSI+CjxnIHN0eWxlPSJzdHJva2U6IG5vbmU7IHN0cm9rZS13aWR0aDogMDsgc3Ryb2tlLWRhc2hhcnJheTogbm9uZTsgc3Ryb2tlLWxpbmVjYXA6IGJ1dHQ7IHN0cm9rZS1saW5lam9pbjogbWl0ZXI7IHN0cm9rZS1taXRlcmxpbWl0OiAxMDsgZmlsbDogbm9uZTsgZmlsbC1ydWxlOiBub256ZXJvOyBvcGFjaXR5OiAxOyIgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMS40MDY1OTM0MDY1OTM0MDE2IDEuNDA2NTkzNDA2NTkzNDAxNikgc2NhbGUoMi44MSAyLjgxKSI+Cgk8cGF0aCBkPSJNIDY5LjI0MyA5MCBjIC01LjM4OSAwIC0xMC42NyAtMi4xMDcgLTE0LjY0MyAtNi4wODEgYyAtNS40MzMgLTUuNDMyIC03LjM5MSAtMTMuNTE0IC01LjExNSAtMjAuODMxIEwgMjYuOTEyIDQwLjUxNSBjIC03LjMxMyAyLjI3NiAtMTUuMzk3IDAuMzIgLTIwLjgzMiAtNS4xMTQgYyAtNS45MzMgLTUuOTMzIC03LjcwNSAtMTQuNzg0IC00LjUxNCAtMjIuNTQ5IGwgMC44NDYgLTIuMDU5IGwgMTIuNDkzIDEyLjQ5MyBjIDIuMzExIDIuMzEgNi4wNyAyLjMxMSA4LjM4MSAwIGMgMi4zMSAtMi4zMTEgMi4zMSAtNi4wNzEgMCAtOC4zODEgTCAxMC43OTQgMi40MTMgbCAyLjA1OSAtMC44NDYgYyA3Ljc2NiAtMy4xOTEgMTYuNjE2IC0xLjQxOCAyMi41NDkgNC41MTQgYyA1LjQzMyA1LjQzMyA3LjM5IDEzLjUxNiA1LjExNCAyMC44MzEgbCAyMi41NzIgMjIuNTczIGMgNy4zMTQgLTIuMjc4IDE1LjM5OCAtMC4zMiAyMC44MzIgNS4xMTQgYyA1LjkzNCA1LjkzMyA3LjcwNCAxNC43ODQgNC41MTQgMjIuNTQ5IGwgLTAuODQ3IDIuMDU5IEwgNzUuMDk1IDY2LjcxNCBjIC0xLjExMyAtMS4xMTMgLTIuNjAxIC0xLjcyNiAtNC4xOTEgLTEuNzI2IHMgLTMuMDc3IDAuNjEzIC00LjE5MSAxLjcyNiBjIC0yLjMxIDIuMzExIC0yLjMxIDYuMDcxIDAgOC4zODEgbCAxMi40OTMgMTIuNDkyIGwgLTIuMDYgMC44NDcgQyA3NC41ODIgODkuNDg3IDcxLjg5OSA4OS45OTkgNjkuMjQzIDkwIHogTSAyNy42OTIgMzcuMSBsIDI1LjIwNiAyNS4yMDcgbCAtMC4zMjIgMC44ODcgYyAtMi4zNDUgNi40NjkgLTAuNzI4IDEzLjc3OSA0LjExOSAxOC42MjYgYyA0LjUzOCA0LjUzOCAxMS4wNjkgNi4yMzUgMTcuMTUyIDQuNjAzIGwgLTkuMjMyIC05LjIzMiBjIC0zLjQ2NiAtMy40NjcgLTMuNDY2IC05LjEwOSAwIC0xMi41NzYgYyAzLjQ2NiAtMy40NjggOS4xMDkgLTMuNDY4IDEyLjU3NiAwIGwgOS4yMzIgOS4yMzIgYyAxLjYzMyAtNi4wODMgLTAuMDY0IC0xMi42MTUgLTQuNjAyIC0xNy4xNTMgYyAtNC44NDcgLTQuODQ3IC0xMi4xNjEgLTYuNDY0IC0xOC42MjcgLTQuMTE4IGwgLTAuODg3IDAuMzIyIEwgMzcuMTAxIDI3LjY5MiBsIDAuMzIyIC0wLjg4NyBjIDIuMzQ1IC02LjQ2OSAwLjcyOSAtMTMuNzggLTQuMTE4IC0xOC42MjcgYyAtNC41MzkgLTQuNTM4IC0xMS4wNyAtNi4yMzUgLTE3LjE1MiAtNC42MDMgbCA5LjIzMiA5LjIzMiBjIDMuNDY3IDMuNDY3IDMuNDY3IDkuMTA5IDAgMTIuNTc2IHMgLTkuMTA5IDMuNDY4IC0xMi41NzYgMCBsIC05LjIzMyAtOS4yMzIgQyAxLjk0MiAyMi4yMzQgMy42NCAyOC43NjUgOC4xNzggMzMuMzA0IGMgNC44NDggNC44NDggMTIuMTYgNi40NjQgMTguNjI4IDQuMTE4IEwgMjcuNjkyIDM3LjEgeiIgc3R5bGU9InN0cm9rZTogbm9uZTsgc3Ryb2tlLXdpZHRoOiAxOyBzdHJva2UtZGFzaGFycmF5OiBub25lOyBzdHJva2UtbGluZWNhcDogYnV0dDsgc3Ryb2tlLWxpbmVqb2luOiBtaXRlcjsgc3Ryb2tlLW1pdGVybGltaXQ6IDEwOyBmaWxsOiByZ2IoMCwwLDApOyBmaWxsLXJ1bGU6IG5vbnplcm87IG9wYWNpdHk6IDE7IiB0cmFuc2Zvcm09IiBtYXRyaXgoMSAwIDAgMSAwIDApICIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIi8+CjwvZz4KPC9zdmc+",
+                    "has_user_valves": false
+                }
+            ],
+            "tags": []
+        },
+        {
+            "id": "reasoning",
+            "name": "Reasoning",
+            "owned_by": "openai",
+            "openai": {
+                "id": "reasoning",
+                "name": "reasoning",
+                "owned_by": "openai",
+                "openai": {
+                    "id": "reasoning"
+                },
+                "urlIdx": 0,
+                "connection_type": "local"
+            },
+            "urlIdx": 0,
+            "connection_type": "local",
+            "info": {
+                "id": "reasoning",
+                "user_id": "6288ec1c-cff0-4cc1-9765-8d3891ec1829",
+                "base_model_id": null,
+                "name": "Reasoning",
+                "meta": {
+                    "description": "API name: reasoning\nDocumentation: https://it.desy.de/dienste/desy_assistant/index_ger.html\nInfo: Currently based on deepseek-ai/DeepSeek-V4-Flash with reasoning capabilities",
+                    "capabilities": {
+                        "file_context": true,
+                        "vision": false,
+                        "file_upload": true,
+                        "web_search": true,
+                        "image_generation": false,
+                        "code_interpreter": true,
+                        "terminal": false,
+                        "citations": true,
+                        "status_updates": true,
+                        "builtin_tools": false
+                    },
+                    "suggestion_prompts": null,
+                    "tags": [],
+                    "filterIds": [
+                        "usage_tracker"
+                    ]
+                },
+                "access_grants": [
+                    {
+                        "id": "eef98b54-d094-4225-a4c4-bdee69c470a4",
+                        "resource_type": "model",
+                        "resource_id": "reasoning",
+                        "principal_type": "user",
+                        "principal_id": "*",
+                        "permission": "read",
+                        "created_at": 1779177255
+                    }
+                ],
+                "is_active": true,
+                "updated_at": 1779177255,
+                "created_at": 1743758984
+            },
+            "actions": [],
+            "filters": [],
+            "tags": []
+        },
+        {
+            "id": "coding",
+            "name": "Coding",
+            "owned_by": "openai",
+            "openai": {
+                "id": "coding",
+                "name": "coding",
+                "owned_by": "openai",
+                "openai": {
+                    "id": "coding"
+                },
+                "urlIdx": 0,
+                "connection_type": "local"
+            },
+            "urlIdx": 0,
+            "connection_type": "local",
+            "info": {
+                "id": "coding",
+                "user_id": "6288ec1c-cff0-4cc1-9765-8d3891ec1829",
+                "base_model_id": null,
+                "name": "Coding",
+                "meta": {
+                    "description": "API name: coding\nDocumentation: https://it.desy.de/dienste/desy_assistant/index_ger.html\nInfo: Currently based on deepseek-ai/DeepSeek-V4-Flash with extended coding capabilities",
+                    "capabilities": {
+                        "file_context": true,
+                        "vision": false,
+                        "file_upload": true,
+                        "web_search": true,
+                        "image_generation": false,
+                        "code_interpreter": true,
+                        "terminal": false,
+                        "citations": true,
+                        "status_updates": true,
+                        "builtin_tools": false
+                    },
+                    "suggestion_prompts": null,
+                    "tags": [],
+                    "filterIds": [
+                        "usage_tracker"
+                    ]
+                },
+                "access_grants": [
+                    {
+                        "id": "e30a2a32-06dc-4e76-8cac-fdfca0370be0",
+                        "resource_type": "model",
+                        "resource_id": "coding",
+                        "principal_type": "user",
+                        "principal_id": "*",
+                        "permission": "read",
+                        "created_at": 1779176997
+                    }
+                ],
+                "is_active": true,
+                "updated_at": 1779176997,
+                "created_at": 1748934795
+            },
+            "actions": [],
+            "filters": [],
+            "tags": []
+        },
+        {
+            "id": "it-uco",
+            "name": "IT-UCO",
+            "object": "model",
+            "created": 1782738212,
+            "owned_by": "openai",
+            "pipeline": {
+                "type": "pipe",
+                "valves": true
+            },
+            "connection_type": "local",
+            "openai": {
+                "id": "it-uco",
+                "name": "it-uco",
+                "object": "model",
+                "created": 1782738212,
+                "owned_by": "openai",
+                "pipeline": {
+                    "type": "pipe",
+                    "valves": true
+                },
+                "connection_type": "local"
+            },
+            "urlIdx": 1,
+            "info": {
+                "id": "it-uco",
+                "user_id": "6288ec1c-cff0-4cc1-9765-8d3891ec1829",
+                "base_model_id": null,
+                "name": "IT-UCO",
+                "meta": {
+                    "description": "desy-assistant enriched with knowledge from the IT User Consulting Office.\nContact: uco@desy.de, 5005",
+                    "capabilities": {
+                        "file_context": true,
+                        "vision": false,
+                        "file_upload": true,
+                        "web_search": true,
+                        "image_generation": false,
+                        "code_interpreter": false,
+                        "terminal": false,
+                        "citations": true,
+                        "status_updates": true,
+                        "builtin_tools": false
+                    },
+                    "suggestion_prompts": null,
+                    "tags": [],
+                    "filterIds": [
+                        "auto_memory",
+                        "usage_tracker"
+                    ]
+                },
+                "access_grants": [
+                    {
+                        "id": "64cdcfc6-9c4c-406f-8196-60a4e6d784d9",
+                        "resource_type": "model",
+                        "resource_id": "it-uco",
+                        "principal_type": "user",
+                        "principal_id": "*",
+                        "permission": "read",
+                        "created_at": 1779784159
+                    }
+                ],
+                "is_active": true,
+                "updated_at": 1779784159,
+                "created_at": 1739284910
+            },
+            "actions": [],
+            "filters": [],
+            "tags": []
+        },
+        {
+            "id": "maxwell",
+            "name": "Maxwell",
+            "object": "model",
+            "created": 1782738212,
+            "owned_by": "openai",
+            "pipeline": {
+                "type": "pipe",
+                "valves": true
+            },
+            "connection_type": "local",
+            "openai": {
+                "id": "maxwell",
+                "name": "maxwell",
+                "object": "model",
+                "created": 1782738212,
+                "owned_by": "openai",
+                "pipeline": {
+                    "type": "pipe",
+                    "valves": true
+                },
+                "connection_type": "local"
+            },
+            "urlIdx": 1,
+            "info": {
+                "id": "maxwell",
+                "user_id": "6288ec1c-cff0-4cc1-9765-8d3891ec1829",
+                "base_model_id": null,
+                "name": "Maxwell",
+                "meta": {
+                    "description": "desy-assistant enriched with knowledge from the Maxwell cluster documentation.",
+                    "capabilities": {
+                        "file_context": true,
+                        "vision": false,
+                        "file_upload": true,
+                        "web_search": true,
+                        "image_generation": false,
+                        "code_interpreter": false,
+                        "terminal": false,
+                        "citations": true,
+                        "status_updates": true,
+                        "builtin_tools": false
+                    },
+                    "suggestion_prompts": [
+                        {
+                            "content": "What is the Maxwell cluster?",
+                            "title": [
+                                "",
+                                ""
+                            ]
+                        },
+                        {
+                            "content": "How can I use the Maxwell cluster?",
+                            "title": [
+                                "",
+                                ""
+                            ]
+                        },
+                        {
+                            "content": "Was ist das Maxwell Cluster?",
+                            "title": [
+                                "",
+                                ""
+                            ]
+                        },
+                        {
+                            "content": "Wie kann ich das Maxwell Cluster nutzen?",
+                            "title": [
+                                "",
+                                ""
+                            ]
+                        }
+                    ],
+                    "tags": [],
+                    "filterIds": [
+                        "auto_memory",
+                        "usage_tracker"
+                    ]
+                },
+                "access_grants": [
+                    {
+                        "id": "6802bd68-bde0-4029-90cd-6dac6b59e8fe",
+                        "resource_type": "model",
+                        "resource_id": "maxwell",
+                        "principal_type": "user",
+                        "principal_id": "*",
+                        "permission": "read",
+                        "created_at": 1779784177
+                    }
+                ],
+                "is_active": true,
+                "updated_at": 1779784177,
+                "created_at": 1739284654
+            },
+            "actions": [],
+            "filters": [],
+            "tags": []
+        },
+        {
+            "id": "maxwell-cssb-cryoem",
+            "name": "Maxwell CSSB CryoEM Software",
+            "object": "model",
+            "created": 1782738212,
+            "owned_by": "openai",
+            "pipeline": {
+                "type": "pipe",
+                "valves": true
+            },
+            "connection_type": "local",
+            "openai": {
+                "id": "maxwell-cssb-cryoem",
+                "name": "maxwell-cssb-cryoem",
+                "object": "model",
+                "created": 1782738212,
+                "owned_by": "openai",
+                "pipeline": {
+                    "type": "pipe",
+                    "valves": true
+                },
+                "connection_type": "local"
+            },
+            "urlIdx": 1,
+            "info": {
+                "id": "maxwell-cssb-cryoem",
+                "user_id": "6288ec1c-cff0-4cc1-9765-8d3891ec1829",
+                "base_model_id": null,
+                "name": "Maxwell CSSB CryoEM Software",
+                "meta": {
+                    "description": "desy-assistant enriched with knowledge from the CSSB CryoEM Software documentation.",
+                    "capabilities": {
+                        "file_context": true,
+                        "vision": false,
+                        "file_upload": true,
+                        "web_search": true,
+                        "image_generation": true,
+                        "code_interpreter": false,
+                        "terminal": false,
+                        "citations": true,
+                        "status_updates": true,
+                        "builtin_tools": false
+                    },
+                    "suggestion_prompts": null,
+                    "tags": [],
+                    "filterIds": [
+                        "auto_memory",
+                        "usage_tracker"
+                    ]
+                },
+                "access_grants": [
+                    {
+                        "id": "d408cffd-2dbb-4187-b1c1-543b103fa988",
+                        "resource_type": "model",
+                        "resource_id": "maxwell-cssb-cryoem",
+                        "principal_type": "user",
+                        "principal_id": "*",
+                        "permission": "read",
+                        "created_at": 1779784138
+                    }
+                ],
+                "is_active": true,
+                "updated_at": 1779784138,
+                "created_at": 1756450009
+            },
+            "actions": [],
+            "filters": [],
+            "tags": []
+        },
+        {
+            "id": "naf",
+            "name": "National Analysis Facility (NAF)",
+            "object": "model",
+            "created": 1782738212,
+            "owned_by": "openai",
+            "pipeline": {
+                "type": "pipe",
+                "valves": true
+            },
+            "connection_type": "local",
+            "openai": {
+                "id": "naf",
+                "name": "naf",
+                "object": "model",
+                "created": 1782738212,
+                "owned_by": "openai",
+                "pipeline": {
+                    "type": "pipe",
+                    "valves": true
+                },
+                "connection_type": "local"
+            },
+            "urlIdx": 1,
+            "info": {
+                "id": "naf",
+                "user_id": "6288ec1c-cff0-4cc1-9765-8d3891ec1829",
+                "base_model_id": null,
+                "name": "National Analysis Facility (NAF)",
+                "meta": {
+                    "description": "desy-assistant enriched with knowledge from the National Analysis Facility (NAF) documentation.",
+                    "capabilities": {
+                        "file_context": true,
+                        "vision": false,
+                        "file_upload": true,
+                        "web_search": true,
+                        "image_generation": false,
+                        "code_interpreter": false,
+                        "terminal": false,
+                        "citations": true,
+                        "status_updates": true,
+                        "usage": false,
+                        "builtin_tools": false
+                    },
+                    "suggestion_prompts": null,
+                    "tags": [],
+                    "filterIds": [
+                        "auto_memory",
+                        "usage_tracker"
+                    ]
+                },
+                "access_grants": [
+                    {
+                        "id": "b5c2e29f-0b6c-41c2-b7b7-a63bff8663c2",
+                        "resource_type": "model",
+                        "resource_id": "naf",
+                        "principal_type": "user",
+                        "principal_id": "*",
+                        "permission": "read",
+                        "created_at": 1779784189
+                    }
+                ],
+                "is_active": true,
+                "updated_at": 1779784189,
+                "created_at": 1740402258
+            },
+            "actions": [],
+            "filters": [],
+            "tags": []
+        },
+        {
+            "id": "dcache-docs",
+            "name": "dCache Documentation",
+            "object": "model",
+            "created": 1782738212,
+            "owned_by": "openai",
+            "pipeline": {
+                "type": "pipe",
+                "valves": true
+            },
+            "connection_type": "local",
+            "openai": {
+                "id": "dcache-docs",
+                "name": "dcache-docs",
+                "object": "model",
+                "created": 1782738212,
+                "owned_by": "openai",
+                "pipeline": {
+                    "type": "pipe",
+                    "valves": true
+                },
+                "connection_type": "local"
+            },
+            "urlIdx": 1,
+            "info": {
+                "id": "dcache-docs",
+                "user_id": "6288ec1c-cff0-4cc1-9765-8d3891ec1829",
+                "base_model_id": null,
+                "name": "dCache Documentation",
+                "meta": {
+                    "description": "desy-assistant enriched with knowledge from the dCache documentation.",
+                    "capabilities": {
+                        "file_context": true,
+                        "vision": false,
+                        "file_upload": true,
+                        "web_search": true,
+                        "image_generation": true,
+                        "code_interpreter": false,
+                        "terminal": false,
+                        "citations": true,
+                        "status_updates": true,
+                        "builtin_tools": false
+                    },
+                    "suggestion_prompts": null,
+                    "tags": [],
+                    "filterIds": [
+                        "auto_memory",
+                        "usage_tracker"
+                    ]
+                },
+                "access_grants": [
+                    {
+                        "id": "8d77e86c-be3e-4c78-94f7-1861e913a240",
+                        "resource_type": "model",
+                        "resource_id": "dcache-docs",
+                        "principal_type": "user",
+                        "principal_id": "*",
+                        "permission": "read",
+                        "created_at": 1779784151
+                    }
+                ],
+                "is_active": true,
+                "updated_at": 1779784151,
+                "created_at": 1739780464
+            },
+            "actions": [],
+            "filters": [],
+            "tags": []
+        }
+    ]
+}
