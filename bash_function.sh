@@ -8,8 +8,9 @@
 # =============================================================================
 
 # folder that stores descriptions of the models avaliable from each service
-service_descriptions_folder="/home/henry/DESY_sync/Documents/Assistant/service_descriptions"
+service_descriptions_folder="/home/henry/DESY_sync/Documents/Assistant/bash_and_notes/service_descriptions"
 aider_repository_dir="/home/henry/DESY_sync/Documents/Assistant/aider_repo"
+export AIDER_RECORDS_DIR="/home/henry/DESY_sync/Documents/Assistant/Records/"
 
 # ---------------------------------------------------------------------------
 # get_password
@@ -373,7 +374,8 @@ _aider_chat_flags() {
     else                             effort="high"
     fi
 
-    echo "--max-chat-history-tokens ${history_tokens} --thinking-tokens ${thinking_tokens} --reasoning-effort ${effort}"
+    #echo "--max-chat-history-tokens ${history_tokens} --thinking-tokens ${thinking_tokens} --reasoning-effort ${effort}"
+    echo "--max-chat-history-tokens ${history_tokens}"
 }
 
 _aider_map_flags() {
