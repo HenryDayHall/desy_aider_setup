@@ -38,15 +38,61 @@ To store your new api key;
 3. When prompted to `Enter secret for "desy":` give it the api key. Then set a password in the pop-up.
 4. Check you can retrieve it with `./secret.sh get desy`
 
+You can see the file you created at `~/.secrets/desy.gpg` -- that's your encrypted api key.
+
 Aside, if you have your own solution for storing secrets at the cli,
 this can be easy implemented by altering the `_get_api_keys()` method in `bash_functions.sh`.
 
 ### Install aider
 
-download
-link the confs to your home dierctory
+Now you need aider itself. 
+Generic download instructions are on the website [aider.chat](aider.chat).
+I recommend you use a conda environment for your own future sanity.
 
-try it out without the function wrappers - you always need internal network/vpn
+```bash
+conda create --name aider
+conda activate aider
+conda install pip
+python -m pip install aider-install
+aider-install
+```
+
+I also recommend you adopt the conf files given in this repository.
+To allow aider to find them automatically go to your home directory and link them from there;
+
+```bash
+cd ~
+ln -s /path/to/this/repository/aider_for_desy/confs/.aider.conf.yml
+ln -s /path/to/this/repository/aider_for_desy/confs/.aider.model.metadata.json
+ln -s /path/to/this/repository/aider_for_desy/confs/.aider.model.settings.yml
+```
+
+This will set some sane defaults, and give aider a bit of information about desy (and blablador) models.
+Some of this information I have estimated, because it's not all published.
+Note that the costs of desy models are not "real", they are my estimate of what that service might be costing desy to provide, you aren't actually going to get a bill.
+
+Now that all this is done, you could give aider a quick try with the desy service;
+
+```bash
+conda activate aider  # if you didn't already
+aider  --openai-api-key=$(./secret.sh get desy) \  # pass api key straight to aider
+       --openai-api-base=https://assistant.desy.de/api/ \  # tell aider where api is
+       --model=openai/reasoning  # tell aider which model you want
+```
+
+It that worked you should see something like;
+```
+─────────────────────────────────────────────────────────────────────────────────────────────────────────
+exist. Skipping.
+Aider v0.86.3.dev+import
+Model: openai/reasoning with whole edit format
+Git repo: .git with 16 files
+Repo-map: using 4096 tokens, auto refresh
+─────────────────────────────────────────────────────────────────────────────────────────────────────────
+>
+```
+
+Press control-c twice to exit.
 
 ### Test function wrappers and add to `.bashrc`
 
