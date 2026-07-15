@@ -148,7 +148,7 @@ This works with or without models specified.
 
 Aider's [own docs](https://aider.chat/docs/usage.html) are the best place to look for advice on usage, but here a couple of quick tips to get started.
 
-You can `\ask` aider to tell you things, and it won't change any files;
+You can `/ask` aider to tell you things, and it won't change any files;
 
 ```bash
 aider_desy
@@ -258,8 +258,19 @@ You can see that aider has directly written the changes into the file.
 
 ## Adding more model apis
 
-TODO
-need to add models to the json
-if you want to use the function wrappers
+If you looked at these scripts, you may have noticed that in principle, they include both blablador and claude too (claude is commented out).
+Being at DESY, you do have the immediate option to try blablador, and can do so simply by generating and storing an api key, in the same way as done for DESY.
+As it's also accessed via openai, and has a different api endpoint url, there is currently no way to use it at the same time as DESY models (we cannot say, use a DESY model for reasoning and a blablador model for the editor), but you can switch to blablador just be starting with `aider_blablador`.
+
+But say you have some claude api tokens. You can use claude in combination with desy models, and I often do. I find a claude reasoning model, with DESY's coding model works great (and saves api tokens over using 3 claude models).
+To do this, you need to add your claude api key (in the same way as the DESY one) and make a small change to `bash_functions.sh`; uncomment line 551 so that your claude api key will also be read and passed as a flag.
+Now you can do something like;
+```
+source bash_functions.sh  # if you haven't already since you changed it
+aider_desy claude-opus-4-8 coding
+```
+
+Should you have some other subscription, the process is about the same. 
+You might want to add some information to `confs/.aider.model.metadata.json` and `confs/.aider.model.settings.yml`, but you don't have to.
 
 
