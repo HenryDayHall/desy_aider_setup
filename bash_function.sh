@@ -33,18 +33,8 @@ if [[ -z "$AIDER_RECORDS_DIR" || ! -d "$AIDER_RECORDS_DIR" ]]; then
     unset _uname _dust_records_dir _home_records_dir
 fi
 
-# ---------------------------------------------------------------------------
-# get_password
-# Description: Retrieves a password for a given entry from a KeePassXC database.
-# Usage:       get_password <entry_name>
-# Arguments:   $1 - Name of the entry in the KeePassXC database.
-# Returns:     Prints the password to stdout.
-# Notes:       Prompts for the KeePassXC master password via KeePassXC
-# ---------------------------------------------------------------------------
-get_password() {
-    local db=~/Accounts/passwordManager/API_keys.kdbx
-    keepassxc-cli show -a Password "$db" $1
-}
+
+
 
 # ---------------------------------------------------------------------------
 # _get_api_keys
@@ -55,17 +45,14 @@ get_password() {
 #              and empty values. After the call, each value is set to the key.
 # Arguments:   $1 - Name of the associative array (passed by nameref).
 # Returns:     0 on success, 1 if any key retrieval fails.
-# Notes:       Prompts for the KeePassXC master password via systemd-ask-password.
+# Notes:       Prompts for the password you created when you wrote the secret
 # ---------------------------------------------------------------------------
 _get_api_keys() {
     declare -n _callers_dict="$1"
-    local db=~/Accounts/passwordManager/API_keys.kdbx
-    local password
-    password=$(systemd-ask-password "KeePassXC password: ")
 
     for service in "${!_callers_dict[@]}"; do
         local api_key
-        api_key=$(echo "$password" | keepassxc-cli show -q -a Password "$db" "$service" 2>/dev/null)
+        api_key=$($script_dir/secret.sh get $service)
         # Throw a sensible error if we don't get a key
         if [[ -z "$api_key" ]]; then
             echo "Error: failed to retrieve API key for '$service'." >&2
@@ -560,7 +547,8 @@ _aider_openai() {
     check_for_aider_confs
 
     # Build the API keys dict and retrieve keys
-    local -A api_key_dict=( ["$openai_service"]="" ["claude"]="" )
+    local -A api_key_dict=( ["$openai_service"]="" )
+    #api_key_dict["claude"]="" # uncomment if you have a claude api key in your secrets
     _get_api_keys api_key_dict || return 1
     _check_update_descriptions api_key_dict
 
@@ -641,7 +629,9 @@ _aider_openai() {
     flags+="$@"
 
     conda activate aider
-    PYTHONPATH=${PYTHONPATH}:${aider_repository_dir} python -m aider $flags
+    # Use this if you have an aider repo for a custom install
+    #PYTHONPATH=${PYTHONPATH}:${aider_repository_dir} python -m aider $flags
+    aider $flags
 }
 
 

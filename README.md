@@ -96,23 +96,169 @@ Press control-c twice to exit.
 
 ### Test function wrappers and add to `.bashrc`
 
-explain the function wrappers
-try it with the function wrappers
+In this repository is a script called `bash_function.sh` which contains some quality of life bash functions. It is intended to;
+
+- Allow you to switch quickly between DESY and blablador if you use both. They have different api enprints, so you can only have one at a time.
+- Generate some quick and sensible defaults for DESY and blablador models.
+- Mix and match with claude models if you desire.
+
+You can give it a try now;
+
+```bash
+source bash_functions.sh
+aider_desy  # will start your conda enviroment and add all sensible flags
+```
+
+Hopefully that just started? If so, your setup is working; press control-c twice to exit.
+You can keep doing `source bash_functions.sh`, or you can add that line to your `~/.bashrc` so that it happens automatically in every shell you start.
 
 ## Basic usage
 
-Remember you need to be in the internal network/have a vpn
-Launch in a repository
+First of all, remember you need to be in the internal network or have the DESY vpn active to access the DESY assistant api.
+If you don't it will just hang.
 
-Launch options, assuming you are using the function wrappers
+Secondly, it's normally a good idea to launch aider in a git repository.
+It's designed to look at, and alter, only files in that repository.
+If you launch aider and you aren't in a git repository it will suggest you start one, and you might not be where you intended to put the root of your repository.
 
-Editing in files
+### cli arguments
 
-### Docs for aider
+I'm going to discuss cli options, assuming you are using the function wrappers.
+A basic start would be just `aider_desy`, but you might want to customise some things.
+
+Firstly, the models can be changed; aider employs 3 different models;
+
+1. Primary model (reasoning, architecture).
+2. Editor model (should be good at writing code and files).
+3. Weak model (summarising the chat and making the repo map).
+
+By default, I give DESY's "reasoning" model for all 3, but if you want, there are other options.
+You can see them all by doing `extract_model_names desy`.
+Then to set specific models;
+```bash
+aider_desy <primary> <editor> <weak>
+```
+For example; `aider_desy reasoning coding desy-assistant`. 
+The names of these models should autocomplete with tab.
+
+Finally, and flags given to this function wrapper will be passed straight to aider.
+This works with or without models specified.
+
+### Usage modes
+
+Aider's [own docs](https://aider.chat/docs/usage.html) are the best place to look for advice on usage, but here a couple of quick tips to get started.
+
+You can `\ask` aider to tell you things, and it won't change any files;
+
+```bash
+aider_desy
+─────────────────────────────────────────────────────────────────────────────────────────────────────────
+exist. Skipping.
+Aider v0.86.3.dev+import
+Model: openai/reasoning with whole edit format
+Git repo: .git with 16 files
+Repo-map: using 4096 tokens, auto refresh
+─────────────────────────────────────────────────────────────────────────────────────────────────────────
+> /ask Can you see where the data loader is in this repository?
+```
+
+If you don't ask, aider may make some file changes if it interprets your question as an instruction.
+
+```bash
+aider_desy
+...
+─────────────────────────────────────────────────────────────────────────────────────────────────────────
+> The data loader struggles with larger files, how can we improve this?
+```
+
+You can also "invoke" aider from your editor.
+First, add the file you want it to work on
+
+```bash
+aider_desy
+...
+─────────────────────────────────────────────────────────────────────────────────────────────────────────
+> /add src/data/dataloader.py
+```
+
+Then with `src/data/dataloader.py` open in your editor, write a comment (must begin with `#` or `\\`) ending with `AI!`, then save the file.
+For example;
+
+```python
+import numpy as np
+
+class DataLoader():
+    def __init__(self, file_name):
+        self.file_name = file_name
+        # check the file exists and throw a warning if not AI!
+    
+    def _open(self):
+        self._loaded = np.load(file_name)
+```
+
+You should see some chatter in the aider window. Something a bit like;
+```bash
+Processing your request...
+---------------------------------------------------------------------------------------------------------
+
+► THINKING
+
+We need to interpret the AI comment: "check the file exists and throw a warning if not AI!" The comment
+is in init. It says to check the file exists and throw a warning if not. The comment also says "AI!" at
+the end, but that's likely just a marker. We need to implement the check: use os.path.exists or similar.
+If file does not exist, issue a warning (maybe using warnings.warn). Also need to fix _open: it uses
+file_name but should be self.file_name. Also need to import os and warnings. Then remove the AI comment.
+
+We'll produce updated dataloader.py.
+
+Also note: The class name is DataLoader, but the file is dataloader.py. That's fine.
+
+We'll add import os, warnings. In init, after setting self.file_name, check if not
+os.path.exists(self.file_name): warnings.warn(f"File {self.file_name} does not exist."). Then remove the
+comment.
+
+In _open, change file_name to self.file_name.
+
+Return entire file.
+
+Let's write.
+
+---------------------------------------------------------------------------------------------------------
+
+► ANSWER
+
+dataloader.py
+
+
+ @@ -1,9 +1,12 @@
+  import numpy as np
+ +import os
+ +import warnings
+
+  class DataLoader():
+      def __init__(self, file_name):
+          self.file_name = file_name
+ -        # check the file exists and throw a warning if not AI!
+ +        if not os.path.exists(self.file_name):
+ +            warnings.warn(f"File {self.file_name} does not exist.")
+
+      def _open(self):
+ -        self._loaded = np.load(file_name)
+ +        self._loaded = np.load(self.file_name)
+
+
+Tokens: 2.9k sent, 313 received. Cost: $0.00049 message, $0.00049 session.
+Applied edit to dataloader.py
+─────────────────────────────────────────────────────────────────────────────────────────────────────────
+```
+
+Now reload your file in the editor (if you editor doesn't automatically reload on changes).
+You can see that aider has directly written the changes into the file.
 
 
 ## Adding more model apis
 
+TODO
 need to add models to the json
 if you want to use the function wrappers
 
