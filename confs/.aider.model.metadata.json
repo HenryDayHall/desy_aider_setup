@@ -1,0 +1,381 @@
+{
+    "openai/desy-assistant": {
+        "max_tokens": 262144,
+        "max_input_tokens": 262144,
+        "max_output_tokens": 262144,
+        "input_cost_per_token": 0.0000015,
+        "output_cost_per_token": 0.0000075,
+        "litellm_provider": "openai",
+        "mode": "chat"
+    },
+    "openai/reasoning": {
+        "max_tokens": 384000,
+        "max_input_tokens": 1000000,
+        "max_output_tokens": 384000,
+        "input_cost_per_token": 0.00000014,
+        "output_cost_per_token": 0.00000028,
+        "cache_read_input_token_cost": 0.0000000028,
+        "litellm_provider": "openai",
+        "mode": "chat"
+    },
+    "openai/coding": {
+        "max_tokens": 384000,
+        "max_input_tokens": 1000000,
+        "max_output_tokens": 384000,
+        "input_cost_per_token": 0.00000014,
+        "output_cost_per_token": 0.00000028,
+        "cache_read_input_token_cost": 0.0000000028,
+        "litellm_provider": "openai",
+        "mode": "chat"
+    },
+    "openai/it-uco": {
+        "max_tokens": 262144,
+        "max_input_tokens": 262144,
+        "max_output_tokens": 262144,
+        "input_cost_per_token": 0.0000015,
+        "output_cost_per_token": 0.0000075,
+        "litellm_provider": "openai",
+        "mode": "chat"
+    },
+    "openai/maxwell": {
+        "max_tokens": 262144,
+        "max_input_tokens": 262144,
+        "max_output_tokens": 262144,
+        "input_cost_per_token": 0.0000015,
+        "output_cost_per_token": 0.0000075,
+        "litellm_provider": "openai",
+        "mode": "chat"
+    },
+    "openai/maxwell-cssb-cryoem": {
+        "max_tokens": 262144,
+        "max_input_tokens": 262144,
+        "max_output_tokens": 262144,
+        "input_cost_per_token": 0.0000015,
+        "output_cost_per_token": 0.0000075,
+        "litellm_provider": "openai",
+        "mode": "chat"
+    },
+    "openai/naf": {
+        "max_tokens": 262144,
+        "max_input_tokens": 262144,
+        "max_output_tokens": 262144,
+        "input_cost_per_token": 0.0000015,
+        "output_cost_per_token": 0.0000075,
+        "litellm_provider": "openai",
+        "mode": "chat"
+    },
+    "openai/dcache-docs": {
+        "max_tokens": 262144,
+        "max_input_tokens": 262144,
+        "max_output_tokens": 262144,
+        "input_cost_per_token": 0.0000015,
+        "output_cost_per_token": 0.0000075,
+        "litellm_provider": "openai",
+        "mode": "chat"
+    },
+    "openai/alias-apertus": {
+        "max_tokens": 65536,
+        "max_input_tokens": 65536,
+        "max_output_tokens": 65536,
+        "input_cost_per_token": 1e-07,
+        "output_cost_per_token": 2e-07,
+        "litellm_provider": "openai",
+        "mode": "chat"
+    },
+    "openai/15 - Apertus-8B-Instruct-2509 - A new swiss model from September 2025": {
+        "max_tokens": 65536,
+        "max_input_tokens": 65536,
+        "max_output_tokens": 65536,
+        "input_cost_per_token": 1e-07,
+        "output_cost_per_token": 2e-07,
+        "litellm_provider": "openai",
+        "mode": "chat"
+    },
+    "openai/alias-eve": {
+        "max_tokens": 131072,
+        "max_input_tokens": 131072,
+        "max_output_tokens": 131072,
+        "input_cost_per_token": 1e-07,
+        "output_cost_per_token": 3e-07,
+        "litellm_provider": "openai",
+        "mode": "chat"
+    },
+    "openai/20 - EVE-Instruct - Expert Earth Observation and Earth Science (ES) domains": {
+        "max_tokens": 131072,
+        "max_input_tokens": 131072,
+        "max_output_tokens": 131072,
+        "input_cost_per_token": 1e-07,
+        "output_cost_per_token": 3e-07,
+        "litellm_provider": "openai",
+        "mode": "chat"
+    },
+    "openai/01 - GPT-OSS-120b - an open model released by OpenAI in August 2025": {
+        "max_tokens": 131072,
+        "max_input_tokens": 131072,
+        "max_output_tokens": 131072,
+        "input_cost_per_token": 3e-08,
+        "output_cost_per_token": 1.5e-07,
+        "litellm_provider": "openai",
+        "mode": "chat"
+    },
+    "openai/alias-fast": {
+        "max_tokens": 131072,
+        "max_input_tokens": 131072,
+        "max_output_tokens": 131072,
+        "input_cost_per_token": 3e-08,
+        "output_cost_per_token": 1.5e-07,
+        "litellm_provider": "openai",
+        "mode": "chat"
+    },
+    "openai/01 - MiniMax-M2.7 - our best model as of April, 2026": {
+        "max_tokens": 98304,
+        "max_input_tokens": 98304,
+        "max_output_tokens": 98304,
+        "input_cost_per_token": 3e-07,
+        "output_cost_per_token": 1.2e-06,
+        "litellm_provider": "openai",
+        "mode": "chat"
+    },
+    "openai/alias-huge": {
+        "max_tokens": 98304,
+        "max_input_tokens": 98304,
+        "max_output_tokens": 98304,
+        "input_cost_per_token": 3e-07,
+        "output_cost_per_token": 1.2e-06,
+        "litellm_provider": "openai",
+        "mode": "chat"
+    },
+    "openai/02 - Qwen3.5-122B-A10B-FP8, general purpose large model": {
+        "max_tokens": 262144,
+        "max_input_tokens": 262144,
+        "max_output_tokens": 262144,
+        "input_cost_per_token": 2.6e-07,
+        "output_cost_per_token": 9e-07,
+        "litellm_provider": "openai",
+        "mode": "chat"
+    },
+    "openai/alias-large": {
+        "max_tokens": 262144,
+        "max_input_tokens": 262144,
+        "max_output_tokens": 262144,
+        "input_cost_per_token": 2.6e-07,
+        "output_cost_per_token": 9e-07,
+        "litellm_provider": "openai",
+        "mode": "chat"
+    },
+    "openai/alias-code": {
+        "max_tokens": 98304,
+        "max_input_tokens": 98304,
+        "max_output_tokens": 98304,
+        "input_cost_per_token": 1.1e-07,
+        "output_cost_per_token": 8e-07,
+        "litellm_provider": "openai",
+        "mode": "chat"
+    },
+    "openai/09 - Qwen3-Coder-Next-FP8 from Feb 2026": {
+        "max_tokens": 98304,
+        "max_input_tokens": 98304,
+        "max_output_tokens": 98304,
+        "input_cost_per_token": 1.1e-07,
+        "output_cost_per_token": 8e-07,
+        "litellm_provider": "openai",
+        "mode": "chat"
+    },
+    "openai/alias-embeddings": {
+        "max_tokens": 8192,
+        "max_input_tokens": 8192,
+        "max_output_tokens": 8192,
+        "input_cost_per_token": 1e-08,
+        "output_cost_per_token": 0.0,
+        "litellm_provider": "openai",
+        "mode": "embedding"
+    },
+    "openai/gpt-3.5-turbo": {
+        "max_tokens": 8192,
+        "max_input_tokens": 8192,
+        "max_output_tokens": 8192,
+        "input_cost_per_token": 1e-08,
+        "output_cost_per_token": 0.0,
+        "litellm_provider": "openai",
+        "mode": "embedding"
+    },
+    "openai/text-davinci-003": {
+        "max_tokens": 8192,
+        "max_input_tokens": 8192,
+        "max_output_tokens": 8192,
+        "input_cost_per_token": 1e-08,
+        "output_cost_per_token": 0.0,
+        "litellm_provider": "openai",
+        "mode": "embedding"
+    },
+    "openai/text-embedding-ada-002": {
+        "max_tokens": 8192,
+        "max_input_tokens": 8192,
+        "max_output_tokens": 8192,
+        "input_cost_per_token": 1e-08,
+        "output_cost_per_token": 0.0,
+        "litellm_provider": "openai",
+        "mode": "embedding"
+    },
+    "openai/alias-qwen3-8b-embeddings": {
+        "max_tokens": 8192,
+        "max_input_tokens": 8192,
+        "max_output_tokens": 8192,
+        "input_cost_per_token": 1e-08,
+        "output_cost_per_token": 0.0,
+        "litellm_provider": "openai",
+        "mode": "embedding"
+    },
+    "openai/08 - Qwen3.6-35B-A3B-FP8 - Multimodal model from Apr 2026": {
+        "max_tokens": 98304,
+        "max_input_tokens": 98304,
+        "max_output_tokens": 98304,
+        "input_cost_per_token": 1.4e-07,
+        "output_cost_per_token": 9e-07,
+        "litellm_provider": "openai",
+        "mode": "chat"
+    },
+    "openai/alias-qwen36-35b": {
+        "max_tokens": 98304,
+        "max_input_tokens": 98304,
+        "max_output_tokens": 98304,
+        "input_cost_per_token": 1.4e-07,
+        "output_cost_per_token": 9e-07,
+        "litellm_provider": "openai",
+        "mode": "chat"
+    },
+    "openai/Kimi-K2.7-Code": {
+        "max_tokens": 245104,
+        "max_input_tokens": 245104,
+        "max_output_tokens": 245104,
+        "input_cost_per_token": 9.5e-07,
+        "output_cost_per_token": 4e-06,
+        "litellm_provider": "openai",
+        "mode": "chat"
+    },
+    "openai/Qwen3.5-397B-A17B": {
+        "max_tokens": 262144,
+        "max_input_tokens": 262144,
+        "max_output_tokens": 262144,
+        "input_cost_per_token": 3.9e-07,
+        "output_cost_per_token": 9e-07,
+        "litellm_provider": "openai",
+        "mode": "chat"
+    },
+    "openai/alias-kimi-k2.7-code": {
+        "max_tokens": 245104,
+        "max_input_tokens": 245104,
+        "max_output_tokens": 245104,
+        "input_cost_per_token": 9.5e-07,
+        "output_cost_per_token": 4e-06,
+        "litellm_provider": "openai",
+        "mode": "chat"
+    },
+    "openai/alias-qwen-huge": {
+        "max_tokens": 262144,
+        "max_input_tokens": 262144,
+        "max_output_tokens": 262144,
+        "input_cost_per_token": 3.9e-07,
+        "output_cost_per_token": 9e-07,
+        "litellm_provider": "openai",
+        "mode": "chat"
+    },
+    "openai/eve-instruct-4gpu": {
+        "max_tokens": 131072,
+        "max_input_tokens": 131072,
+        "max_output_tokens": 131072,
+        "input_cost_per_token": 1e-07,
+        "output_cost_per_token": 3e-07,
+        "litellm_provider": "openai",
+        "mode": "chat"
+    },
+    "openai/hy-mt2-30b-fp8": {
+        "max_tokens": 262144,
+        "max_input_tokens": 262144,
+        "max_output_tokens": 262144,
+        "input_cost_per_token": 1e-07,
+        "output_cost_per_token": 3e-07,
+        "litellm_provider": "openai",
+        "mode": "chat"
+    },
+    "anthropic/claude-fable-5": {
+        "max_tokens": 128000,
+        "max_input_tokens": 1000000,
+        "max_output_tokens": 128000,
+        "input_cost_per_token": 1e-05,
+        "output_cost_per_token": 5e-05,
+        "cache_read_input_token_cost": 1e-06,
+        "litellm_provider": "anthropic",
+        "mode": "chat"
+    },
+    "anthropic/claude-opus-4-8": {
+        "max_tokens": 128000,
+        "max_input_tokens": 1000000,
+        "max_output_tokens": 128000,
+        "input_cost_per_token": 5e-06,
+        "output_cost_per_token": 2.5e-05,
+        "cache_read_input_token_cost": 5e-07,
+        "litellm_provider": "anthropic",
+        "mode": "chat"
+    },
+    "anthropic/claude-opus-4-7": {
+        "max_tokens": 128000,
+        "max_input_tokens": 1000000,
+        "max_output_tokens": 128000,
+        "input_cost_per_token": 5e-06,
+        "output_cost_per_token": 2.5e-05,
+        "cache_read_input_token_cost": 5e-07,
+        "litellm_provider": "anthropic",
+        "mode": "chat"
+    },
+    "anthropic/claude-sonnet-4-6": {
+        "max_tokens": 128000,
+        "max_input_tokens": 1000000,
+        "max_output_tokens": 128000,
+        "input_cost_per_token": 3e-06,
+        "output_cost_per_token": 1.5e-05,
+        "cache_read_input_token_cost": 3e-07,
+        "litellm_provider": "anthropic",
+        "mode": "chat"
+    },
+    "anthropic/claude-opus-4-6": {
+        "max_tokens": 128000,
+        "max_input_tokens": 1000000,
+        "max_output_tokens": 128000,
+        "input_cost_per_token": 5e-06,
+        "output_cost_per_token": 2.5e-05,
+        "cache_read_input_token_cost": 5e-07,
+        "litellm_provider": "anthropic",
+        "mode": "chat"
+    },
+    "anthropic/claude-opus-4-5-20251101": {
+        "max_tokens": 64000,
+        "max_input_tokens": 200000,
+        "max_output_tokens": 64000,
+        "input_cost_per_token": 5e-06,
+        "output_cost_per_token": 2.5e-05,
+        "cache_read_input_token_cost": 5e-07,
+        "litellm_provider": "anthropic",
+        "mode": "chat"
+    },
+    "anthropic/claude-haiku-4-5-20251001": {
+        "max_tokens": 64000,
+        "max_input_tokens": 200000,
+        "max_output_tokens": 64000,
+        "input_cost_per_token": 1e-06,
+        "output_cost_per_token": 5e-06,
+        "cache_read_input_token_cost": 1e-07,
+        "litellm_provider": "anthropic",
+        "mode": "chat"
+    },
+    "anthropic/claude-sonnet-4-5-20250929": {
+        "max_tokens": 64000,
+        "max_input_tokens": 1000000,
+        "max_output_tokens": 64000,
+        "input_cost_per_token": 3e-06,
+        "output_cost_per_token": 1.5e-05,
+        "cache_read_input_token_cost": 3e-07,
+        "litellm_provider": "anthropic",
+        "mode": "chat"
+    }
+}
