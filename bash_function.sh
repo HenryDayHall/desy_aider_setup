@@ -8,9 +8,30 @@
 # =============================================================================
 
 # folder that stores descriptions of the models avaliable from each service
-service_descriptions_folder="/home/henry/DESY_sync/Documents/Assistant/bash_and_notes/service_descriptions"
-aider_repository_dir="/home/henry/DESY_sync/Documents/Assistant/aider_repo"
-export AIDER_RECORDS_DIR="/home/henry/DESY_sync/Documents/Assistant/Records/"
+# the service_descriptions folder is in the same directory as this script.
+script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+service_descriptions_folder="$script_dir/service_descriptions"
+
+
+aider_repository_dir="$HOME/Assistant/aider_repo"
+if [[ ! -d "$aider_repository_dir" ]]; then
+    echo "Warning: aider_repository_dir '$aider_repository_dir' does not exist." >&2
+fi
+
+if [[ -z "$AIDER_RECORDS_DIR" || ! -d "$AIDER_RECORDS_DIR" ]]; then
+    _uname="$(id -un)"
+    _dust_records_dir="/data/dust/user/${_uname}/Assistant/Records/"
+    _home_records_dir="/home/${_uname}/Assistant/Records/"
+    if [[ -d "$_dust_records_dir" ]]; then
+        export AIDER_RECORDS_DIR="$_dust_records_dir"
+    elif [[ -d "$_home_records_dir" ]]; then
+        export AIDER_RECORDS_DIR="$_home_records_dir"
+    else
+        echo "Warning: no AIDER_RECORDS_DIR found (tried '$_dust_records_dir' and '$_home_records_dir')." >&2
+        export AIDER_RECORDS_DIR=""
+    fi
+    unset _uname _dust_records_dir _home_records_dir
+fi
 
 # ---------------------------------------------------------------------------
 # get_password

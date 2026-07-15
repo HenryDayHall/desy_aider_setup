@@ -1,5 +1,12 @@
 # Rating assistants
 
+Note, need more rating options;
+
+/rate <answer quality>
+/rate timeout
+/rate impatient
+/rate other
+
 ## End goal
 
 Minimise token use and carbon cost while maintaining a high success rate.
