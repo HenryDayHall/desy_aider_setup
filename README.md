@@ -26,6 +26,8 @@ Just for completeness, as of today's date the process is;
 
 ### Safely store api keys
 
+*NB; not currently working on maxwell! This works locally only*
+
 While it's perfectly possible to store your api keys in plain text it's a bad idea.
 Github is being constantly scanned for leaked secrets like api keys, and AI has in general accelerated the pace of cyber attacks.
 Using `gpg` to store and retrieve secrets is very portable, safe, and easy.
