@@ -1,10 +1,10 @@
 # aider for DESY
 
 This repository contains bash scripts aimed at safely and effectively using the DESY assistant with aider.
-It assumes that you have your own installation of aider, and have set up the api keys for the DESY assistant (see the section on setting up).
+It talks you through getting your own installation of aider, and setting up the api keys for the DESY assistant (see the section on setting up).
 It is still very much in "alpha", and feedback is most welcome.
 
-For the sake of proper compliance, please make sure you have done the AI safety training.
+For the sake of proper compliance, please make sure you have done the AI safety training. 
 
 
 ## Set up
