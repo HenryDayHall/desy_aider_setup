@@ -38,6 +38,8 @@ To store your new api key;
 3. When prompted to `Enter secret for "desy":` give it the api key. Then set a password in the pop-up.
 4. Check you can retrieve it with `./secret.sh get desy`
 
+Aside, if you have your own solution for storing secrets at the cli,
+this can be easy implemented by altering the `_get_api_keys()` method in `bash_functions.sh`.
 
 ### Install aider
 
