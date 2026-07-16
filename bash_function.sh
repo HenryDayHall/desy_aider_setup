@@ -548,7 +548,10 @@ _aider_openai() {
 
     # Build the API keys dict and retrieve keys
     local -A api_key_dict=( ["$openai_service"]="" )
-    #api_key_dict["claude"]="" # uncomment if you have a claude api key in your secrets
+    # Only add claude to the dict if it exists in the secret store
+    if $script_dir/secret.sh list 2>/dev/null | grep -qx 'claude'; then
+        api_key_dict["claude"]=""
+    fi
     _get_api_keys api_key_dict || return 1
     _check_update_descriptions api_key_dict
 
@@ -629,9 +632,12 @@ _aider_openai() {
     flags+="$@"
 
     conda activate aider
-    # Use this if you have an aider repo for a custom install
-    #PYTHONPATH=${PYTHONPATH}:${aider_repository_dir} python -m aider $flags
-    aider $flags
+
+    if [[ -d "$aider_repository_dir" && -d "$aider_repository_dir/aider" ]]; then
+        PYTHONPATH=${PYTHONPATH}:${aider_repository_dir} python -m aider $flags
+    else
+        aider $flags
+    fi
 }
 
 

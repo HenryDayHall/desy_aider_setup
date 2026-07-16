@@ -4,6 +4,8 @@ This repository contains bash scripts aimed at safely and effectively using the 
 It talks you through getting your own installation of aider, and setting up the api keys for the DESY assistant (see the section on setting up).
 It is still very much in "alpha", and feedback is most welcome.
 
+This should be usable on your own PC, on maxwell, or any other cluster you happen to be on. 
+
 For the sake of proper compliance, please make sure you have done the AI safety training. 
 
 
