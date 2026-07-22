@@ -52,6 +52,7 @@ _get_api_keys() {
 
     for service in "${!_callers_dict[@]}"; do
         local api_key
+        echo "Need api key for $service"
         api_key=$($script_dir/secret.sh get $service)
         # Throw a sensible error if we don't get a key
         if [[ -z "$api_key" ]]; then
